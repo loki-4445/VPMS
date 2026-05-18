@@ -31,13 +31,13 @@
     <div class="flex flex-wrap gap-2 items-center">
       <div class="relative flex-1 min-w-48">
         <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-        <input class="input-tw pl-8 text-sm" placeholder="Search name or email…" [(ngModel)]="searchTerm" />
+        <input class="input-tw text-sm" style="padding-left:2.75rem" placeholder="Search name or email…" [(ngModel)]="searchTerm" />
       </div>
       <select class="input-tw w-36 text-sm" [(ngModel)]="filterRole">
-        <option value="">All Roles</option>
-        <option value="ADMIN">Admin</option>
-        <option value="STAFF">Staff</option>
-        <option value="CUSTOMER">Customer</option>
+        <option value="">ALL ROLES</option>
+        <option value="ADMIN">ADMIN</option>
+        <option value="STAFF">STAFF</option>
+        <option value="CUSTOMER">CUSTOMER</option>
       </select>
       <button (click)="searchTerm=''; filterRole=''"
         class="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 px-3 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition-all">

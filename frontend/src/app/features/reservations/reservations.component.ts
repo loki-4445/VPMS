@@ -150,6 +150,6 @@ export class ReservationsComponent implements OnInit {
   }
 
   statusBadge(s: string) {
-    return s === 'ACTIVE' ? 'success' : s === 'CANCELLED' ? 'danger' : 'secondary';
+    return s === 'CONFIRMED' ? 'success' : s === 'CANCELLED' ? 'danger' : 'secondary';
   }
 }

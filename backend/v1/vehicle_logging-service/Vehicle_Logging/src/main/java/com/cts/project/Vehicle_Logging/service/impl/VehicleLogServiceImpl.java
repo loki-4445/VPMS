@@ -148,7 +148,7 @@ public class VehicleLogServiceImpl implements VehicleLogService {
 
             int slotStatus = slot.getOccupiedStatus();
 
-            if (slotStatus == 1) {
+            if (slotStatus == 1 || slotStatus == 0) {
                 log.warn("Walk-in denied | slot occupied or reserved | slotId={} status={}",
                         resolvedSlotId, slotStatus);
                 throw new SlotNotAvailableException(resolvedSlotId,

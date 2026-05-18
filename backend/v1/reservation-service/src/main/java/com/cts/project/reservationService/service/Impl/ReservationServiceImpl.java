@@ -67,8 +67,8 @@ public class ReservationServiceImpl implements ReservationService {
             log.warn("Slot {} already booked for requested time", slotId);
             throw new SlotAlreadyBookedException(slotId);
         }
-        // Mark slot as occupied via Feign
-        parkingClient.updateSlotStatus(slotId, 1);
+        // Mark slot as reserved (0) — becomes occupied (1) only when vehicle physically enters
+        parkingClient.updateSlotStatus(slotId, 0);
         reservation.setUserId(userId);
         reservation.setSlotId(slotId);
         reservation.setStatus(STATUS_CONFIRMED);
