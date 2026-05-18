@@ -40,12 +40,12 @@
     <div class="flex flex-wrap gap-2 items-center">
       <div class="relative flex-1 min-w-48">
         <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-        <input class="input-tw pl-8 text-sm" placeholder="Search vehicle number…" [(ngModel)]="searchVehicle" />
+        <input class="input-tw text-sm" style="padding-left:2.75rem" placeholder="Search vehicle number…" [(ngModel)]="searchVehicle" />
       </div>
       <select class="input-tw w-36 text-sm" [(ngModel)]="filterStatus">
-        <option value="">All Statuses</option>
-        <option value="ACTIVE">Active</option>
-        <option value="COMPLETED">Completed</option>
+        <option value="">ALL STATUSES</option>
+        <option value="ACTIVE">ACTIVE</option>
+        <option value="COMPLETED">COMPLETED</option>
       </select>
       <button (click)="filterStatus=''; searchVehicle=''"
         class="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 px-3 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition-all">
@@ -128,11 +128,11 @@
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1">Select Reserved Vehicle <span class="text-red-500">*</span></label>
           @if (activeReservations().length > 0) {
-            <div class="relative">
+            <div class="relative w-full">
               <!-- Autocomplete input -->
-              <div class="relative">
+              <div class="relative w-full">
                 <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
-                <input class="input-tw pl-8 pr-8 text-sm" placeholder="Type vehicle number…"
+                <input class="input-tw text-sm w-full" style="padding-left:2.75rem;padding-right:2.25rem" placeholder="Type vehicle number…"
                   [(ngModel)]="entrySearch" autocomplete="off"
                   (input)="showEntryDropdown = true"
                   (focus)="showEntryDropdown = true"
@@ -177,15 +177,28 @@
               (input)="entryForm.vehicleNumber = entryForm.vehicleNumber.toUpperCase()" />
           }
         </div>
-        <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1">Assign Slot <span class="text-red-500">*</span></label>
-          <select class="input-tw" [(ngModel)]="entryForm.slotId">
-            <option [value]="0" disabled>Select available slot</option>
-            @for (slot of availableSlots(); track slot.id) {
-              <option [value]="slot.id">{{ slot.location }}-{{ slot.id }} ({{ slot.type }})</option>
-            }
-          </select>
-        </div>
+        @if (reservationSelected) {
+          <!-- Slot pre-assigned from reservation — read-only -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1">Assigned Slot</label>
+            <div class="flex items-center gap-2 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700">
+              <i class="bi bi-geo-alt-fill text-indigo-500"></i>
+              Slot #{{ entryForm.slotId }}
+              <span class="ml-auto text-xs text-slate-400">Pre-assigned from reservation</span>
+            </div>
+          </div>
+        } @else {
+          <!-- Walk-in: no reservation selected, let user pick a slot -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1">Assign Slot <span class="text-red-500">*</span></label>
+            <select class="input-tw" [(ngModel)]="entryForm.slotId">
+              <option [value]="0" disabled>Select available slot</option>
+              @for (slot of availableSlots(); track slot.id) {
+                <option [value]="slot.id">{{ slot.location }}-{{ slot.id }} ({{ slot.type }})</option>
+              }
+            </select>
+          </div>
+        }
       </div>
       <div class="flex justify-end gap-2 px-6 pb-5">
         <button (click)="showEntryModal.set(false)" class="btn-secondary-tw">Cancel</button>
@@ -223,11 +236,11 @@
         <div>
           <label class="block text-sm font-semibold text-slate-700 mb-1">Select Vehicle to Exit <span class="text-red-500">*</span></label>
           @if (activeVehicleLogs.length > 0) {
-            <div class="relative">
+            <div class="relative w-full">
               <!-- Autocomplete input -->
-              <div class="relative">
+              <div class="relative w-full">
                 <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
-                <input class="input-tw pl-8 pr-8 text-sm" placeholder="Type vehicle number…"
+                <input class="input-tw text-sm w-full" style="padding-left:2.75rem;padding-right:2.25rem" placeholder="Type vehicle number…"
                   [(ngModel)]="exitSearch" autocomplete="off"
                   (input)="showExitDropdown = true; exitVehicleNumber = ''"
                   (focus)="showExitDropdown = true"

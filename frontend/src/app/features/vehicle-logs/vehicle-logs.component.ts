@@ -46,6 +46,7 @@ export class VehicleLogsComponent implements OnInit {
 
   // Entry form — userId auto-filled from auth
   entryForm = { vehicleNumber: '', slotId: 0 };
+  reservationSelected = false;
   exitVehicleNumber = '';
 
   // After exit: invoice generation
@@ -79,6 +80,7 @@ export class VehicleLogsComponent implements OnInit {
 
   openEntryModal() {
     this.entryForm = { vehicleNumber: '', slotId: 0 };
+    this.reservationSelected = false;
     this.entrySearch = '';
     this.showEntryDropdown = false;
     this.resSvc.getActive().subscribe({
@@ -103,12 +105,14 @@ export class VehicleLogsComponent implements OnInit {
     this.entryForm.vehicleNumber = res.vehicleNumber;
     this.entryForm.slotId = res.slotId;
     this.entrySearch = res.vehicleNumber;
+    this.reservationSelected = true;
     this.showEntryDropdown = false;
   }
 
   clearEntrySearch() {
     this.entrySearch = '';
     this.entryForm = { vehicleNumber: '', slotId: 0 };
+    this.reservationSelected = false;
     this.showEntryDropdown = false;
   }
 
