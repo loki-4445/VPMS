@@ -1,0 +1,195 @@
+<div class="animate-fade-in">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+        <i class="bi bi-grid-3x3-gap-fill text-indigo-600"></i> Parking Slots
+      </h1>
+      <p class="text-sm text-slate-500 mt-0.5">{{ slots().length }} slots total</p>
+    </div>
+    <button (click)="openAdd()" class="btn-primary-tw flex items-center gap-1.5">
+      <i class="bi bi-plus-lg"></i> Add Slot
+    </button>
+  </div>
+
+  <!-- Alerts -->
+  @if (success()) {
+    <div class="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg px-4 py-3 mb-4 text-sm animate-fade-in">
+      <i class="bi bi-check-circle-fill text-emerald-500"></i> {{ success() }}
+      <button (click)="success.set('')" class="ml-auto text-emerald-600 hover:text-emerald-800"><i class="bi bi-x-lg"></i></button>
+    </div>
+  }
+  @if (error()) {
+    <div class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 rounded-lg px-4 py-3 mb-4 text-sm animate-fade-in">
+      <i class="bi bi-exclamation-circle-fill text-red-500"></i> {{ error() }}
+      <button (click)="error.set('')" class="ml-auto text-red-600 hover:text-red-800"><i class="bi bi-x-lg"></i></button>
+    </div>
+  }
+
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
+    <div class="card-tw p-4 text-center animate-slide-up">
+      <div class="text-2xl font-bold text-slate-800">{{ stats.total }}</div>
+      <div class="text-xs text-slate-400 mt-1">Total</div>
+    </div>
+    <div class="card-tw p-4 text-center border-l-4 border-emerald-400 animate-slide-up delay-75">
+      <div class="text-2xl font-bold text-emerald-600">{{ stats.available }}</div>
+      <div class="text-xs text-slate-400 mt-1">Available</div>
+    </div>
+    <div class="card-tw p-4 text-center border-l-4 border-amber-400 animate-slide-up delay-100">
+      <div class="text-2xl font-bold text-amber-600">{{ stats.reserved }}</div>
+      <div class="text-xs text-slate-400 mt-1">Reserved</div>
+    </div>
+    <div class="card-tw p-4 text-center border-l-4 border-red-400 animate-slide-up delay-150">
+      <div class="text-2xl font-bold text-red-600">{{ stats.occupied }}</div>
+      <div class="text-xs text-slate-400 mt-1">Occupied</div>
+    </div>
+    <div class="card-tw p-4 text-center border-l-4 border-sky-400 animate-slide-up delay-200">
+      <div class="text-2xl font-bold text-sky-600">{{ stats.twoW }}</div>
+      <div class="text-xs text-slate-400 mt-1">2-Wheeler</div>
+    </div>
+    <div class="card-tw p-4 text-center border-l-4 border-indigo-400 animate-slide-up delay-300">
+      <div class="text-2xl font-bold text-indigo-600">{{ stats.fourW }}</div>
+      <div class="text-xs text-slate-400 mt-1">4-Wheeler</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="card-tw p-3 mb-4">
+    <div class="flex flex-wrap gap-2 items-center">
+      <select class="input-tw w-36 text-sm" [(ngModel)]="filterType" (change)="applyFilter()">
+        <option value="">All Types</option>
+        <option value="2W">2-Wheeler</option>
+        <option value="4W">4-Wheeler</option>
+      </select>
+      <select class="input-tw w-36 text-sm" [(ngModel)]="filterStatus" (change)="applyFilter()">
+        <option value="">All Statuses</option>
+        <option value="-1">Available</option>
+        <option value="0">Reserved</option>
+        <option value="1">Occupied</option>
+      </select>
+      <button (click)="filterType=''; filterStatus=''; load()"
+        class="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 px-3 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition-all">
+        <i class="bi bi-x-circle"></i> Clear
+      </button>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card-tw overflow-hidden">
+    @if (loading()) {
+      <div class="flex justify-center items-center py-16">
+        <svg class="animate-spin h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+        </svg>
+      </div>
+    } @else if (slots().length === 0) {
+      <div class="text-center py-16 text-slate-400">
+        <i class="bi bi-grid-3x3-gap text-4xl block mb-2"></i>
+        <p class="text-sm">No slots found</p>
+      </div>
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-xs uppercase text-slate-400 bg-slate-50 border-b border-slate-100">
+              <th class="text-left px-5 py-3 font-semibold">Slot ID</th>
+              <th class="text-left px-5 py-3 font-semibold">Type</th>
+              <th class="text-left px-5 py-3 font-semibold">Floor</th>
+              <th class="text-left px-5 py-3 font-semibold">Status</th>
+              <th class="text-right px-5 py-3 font-semibold">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (s of slots(); track s.id) {
+              <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                <td class="px-5 py-3 font-semibold text-slate-700">#{{ s.id }}</td>
+                <td class="px-5 py-3">
+                  @if (s.type === '2W') {
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-sky-100 text-sky-700">
+                      <i class="bi bi-bicycle"></i> 2W
+                    </span>
+                  } @else {
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">
+                      <i class="bi bi-car-front"></i> 4W
+                    </span>
+                  }
+                </td>
+                <td class="px-5 py-3">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+                    {{ s.location }}-{{ s.id }}
+                  </span>
+                </td>
+                <td class="px-5 py-3">
+                  @if (s.occupiedStatus === -1) { <span class="badge-active">Available</span> }
+                  @else if (s.occupiedStatus === 0) { <span class="badge-reserved">Reserved</span> }
+                  @else { <span class="badge-cancelled">Occupied</span> }
+                </td>
+                <td class="px-5 py-3 text-right">
+                  <button (click)="openEdit(s)"
+                    class="inline-flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 px-2.5 py-1.5 rounded-lg transition-all border border-indigo-200 mr-1">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button (click)="delete(s)"
+                    class="inline-flex items-center gap-1 text-xs text-red-500 hover:text-red-700 hover:bg-red-50 px-2.5 py-1.5 rounded-lg transition-all border border-red-200">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Modal -->
+@if (showModal()) {
+  <div class="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm animate-fade-in" (click)="showModal.set(false)"></div>
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm animate-scale-in">
+      <div class="flex items-center justify-between px-6 pt-5 pb-4 border-b border-slate-100">
+        <h3 class="font-bold text-slate-800">{{ editMode() ? 'Edit Slot' : 'Add New Slot' }}</h3>
+        <button (click)="showModal.set(false)" class="text-slate-400 hover:text-slate-600 transition-colors">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        @if (error()) {
+          <div class="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{{ error() }}</div>
+        }
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1">Type</label>
+          <select class="input-tw" [(ngModel)]="form.type">
+            <option value="2W">2-Wheeler</option>
+            <option value="4W">4-Wheeler</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1">Location (Floor)</label>
+          <select class="input-tw" [(ngModel)]="form.location">
+            <option value="G">Ground (G)</option>
+            <option value="A">Floor A</option>
+            <option value="B">Floor B</option>
+            <option value="C">Floor C</option>
+            <option value="D">Floor D</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 px-6 pb-5">
+        <button (click)="showModal.set(false)" class="btn-secondary-tw">Cancel</button>
+        <button (click)="save()" [disabled]="saving()" class="btn-primary-tw flex items-center gap-1.5">
+          @if (saving()) {
+            <svg class="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+            </svg>
+          }
+          {{ editMode() ? 'Update' : 'Add Slot' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

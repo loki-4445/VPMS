@@ -1,0 +1,113 @@
+<aside class="sidebar-nav flex flex-col bg-white border-r border-slate-100 shadow-sm transition-all duration-300 h-full"
+  [class.w-56]="!collapsed()"
+  [class.w-14]="collapsed()">
+
+  <!-- Toggle button -->
+  <div class="flex justify-end p-2 border-b border-slate-100">
+    <button (click)="toggle()"
+      class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200"
+      [title]="collapsed() ? 'Expand' : 'Collapse'">
+      <i class="bi text-sm" [class.bi-chevron-left]="!collapsed()" [class.bi-chevron-right]="collapsed()"></i>
+    </button>
+  </div>
+
+  <nav class="flex-1 overflow-y-auto py-2 px-2">
+
+    <!-- Dashboard — all roles -->
+    <a routerLink="/dashboard" routerLinkActive="active-nav"
+      class="nav-item flex items-center gap-3 px-2 py-2.5 rounded-lg text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200 no-underline mb-0.5"
+      [title]="collapsed() ? 'Dashboard' : ''">
+      <i class="bi bi-speedometer2 text-base shrink-0"></i>
+      @if (!collapsed()) { <span class="text-sm font-medium truncate">Dashboard</span> }
+    </a>
+
+    <!-- Users — Admin only -->
+    @if (auth.isAdmin()) {
+      <a routerLink="/users" routerLinkActive="active-nav"
+        class="nav-item flex items-center gap-3 px-2 py-2.5 rounded-lg text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200 no-underline mb-0.5"
+        [title]="collapsed() ? 'Users' : ''">
+        <i class="bi bi-people-fill text-base shrink-0"></i>
+        @if (!collapsed()) { <span class="text-sm font-medium truncate">Users</span> }
+      </a>
+    }
+
+    <!-- Parking Slots — Admin & Staff -->
+    @if (auth.hasRole('ADMIN', 'STAFF')) {
+      <a routerLink="/slots" routerLinkActive="active-nav"
+        class="nav-item flex items-center gap-3 px-2 py-2.5 rounded-lg text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200 no-underline mb-0.5"
+        [title]="collapsed() ? 'Parking Slots' : ''">
+        <i class="bi bi-grid-3x3-gap-fill text-base shrink-0"></i>
+        @if (!collapsed()) { <span class="text-sm font-medium truncate">Parking Slots</span> }
+      </a>
+    }
+
+    <!-- Reservations — Admin/Staff show "Reservations", Customer shows "Book Slots" -->
+    @if (auth.hasRole('ADMIN', 'STAFF')) {
+      <a routerLink="/reservations" routerLinkActive="active-nav"
+        class="nav-item flex items-center gap-3 px-2 py-2.5 rounded-lg text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200 no-underline mb-0.5"
+        [title]="collapsed() ? 'Reservations' : ''">
+        <i class="bi bi-calendar-check-fill text-base shrink-0"></i>
+        @if (!collapsed()) { <span class="text-sm font-medium truncate">Reservations</span> }
+      </a>
+    }
+    @if (auth.isCustomer()) {
+      <a routerLink="/reservations" routerLinkActive="active-nav"
+        class="nav-item flex items-center gap-3 px-2 py-2.5 rounded-lg text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200 no-underline mb-0.5"
+        [title]="collapsed() ? 'Book Slots' : ''">
+        <i class="bi bi-bookmark-plus-fill text-base shrink-0"></i>
+        @if (!collapsed()) { <span class="text-sm font-medium truncate">Book Slots</span> }
+      </a>
+    }
+
+    <!-- Vehicle Logs — Admin & Staff -->
+    @if (auth.hasRole('ADMIN', 'STAFF')) {
+      <a routerLink="/vehicle-logs" routerLinkActive="active-nav"
+        class="nav-item flex items-center gap-3 px-2 py-2.5 rounded-lg text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200 no-underline mb-0.5"
+        [title]="collapsed() ? 'Vehicle Logs' : ''">
+        <i class="bi bi-car-front-fill text-base shrink-0"></i>
+        @if (!collapsed()) { <span class="text-sm font-medium truncate">Vehicle Logs</span> }
+      </a>
+    }
+
+    <!-- Invoices — Admin & Staff -->
+    @if (auth.hasRole('ADMIN', 'STAFF')) {
+      <a routerLink="/invoices" routerLinkActive="active-nav"
+        class="nav-item flex items-center gap-3 px-2 py-2.5 rounded-lg text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200 no-underline mb-0.5"
+        [title]="collapsed() ? 'Invoices' : ''">
+        <i class="bi bi-receipt-cutoff text-base shrink-0"></i>
+        @if (!collapsed()) { <span class="text-sm font-medium truncate">Invoices</span> }
+      </a>
+    }
+
+    <!-- Booking History — Customer only -->
+    @if (auth.isCustomer()) {
+      <a routerLink="/booking-history" routerLinkActive="active-nav"
+        class="nav-item flex items-center gap-3 px-2 py-2.5 rounded-lg text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200 no-underline mb-0.5"
+        [title]="collapsed() ? 'Booking History' : ''">
+        <i class="bi bi-clock-history text-base shrink-0"></i>
+        @if (!collapsed()) { <span class="text-sm font-medium truncate">Booking History</span> }
+      </a>
+    }
+
+    <!-- Profile — Customer only -->
+    @if (auth.isCustomer()) {
+      <a routerLink="/profile" routerLinkActive="active-nav"
+        class="nav-item flex items-center gap-3 px-2 py-2.5 rounded-lg text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200 no-underline mb-0.5"
+        [title]="collapsed() ? 'Profile' : ''">
+        <i class="bi bi-person-circle text-base shrink-0"></i>
+        @if (!collapsed()) { <span class="text-sm font-medium truncate">Profile</span> }
+      </a>
+    }
+
+  </nav>
+
+  <!-- Status indicator -->
+  @if (!collapsed()) {
+    <div class="px-4 py-3 border-t border-slate-100">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+        <span class="text-xs text-slate-400">System Online</span>
+      </div>
+    </div>
+  }
+</aside>

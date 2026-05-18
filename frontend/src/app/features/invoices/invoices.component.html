@@ -1,0 +1,211 @@
+<div class="animate-fade-in">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+        <i class="bi bi-receipt-cutoff text-indigo-600"></i> Invoices & Billing
+      </h1>
+      <p class="text-sm text-slate-500 mt-0.5">{{ invoices().length }} total invoices</p>
+    </div>
+  </div>
+
+  <!-- Alerts -->
+  @if (success()) {
+    <div class="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg px-4 py-3 mb-4 text-sm animate-fade-in">
+      <i class="bi bi-check-circle-fill text-emerald-500"></i> {{ success() }}
+      <button (click)="success.set('')" class="ml-auto"><i class="bi bi-x-lg"></i></button>
+    </div>
+  }
+  @if (error()) {
+    <div class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 rounded-lg px-4 py-3 mb-4 text-sm animate-fade-in">
+      <i class="bi bi-exclamation-circle-fill text-red-500"></i> {{ error() }}
+      <button (click)="error.set('')" class="ml-auto"><i class="bi bi-x-lg"></i></button>
+    </div>
+  }
+
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
+    <div class="card-tw p-5 animate-slide-up delay-75">
+      <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Total Revenue</p>
+      <p class="text-2xl font-bold text-emerald-600 mt-1">₹{{ totalRevenue }}</p>
+      <p class="text-xs text-slate-400 mt-1">from paid invoices</p>
+    </div>
+    <div class="card-tw p-5 animate-slide-up delay-100">
+      <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Paid</p>
+      <p class="text-2xl font-bold text-slate-800 mt-1">{{ paidCount }}</p>
+      <p class="text-xs text-slate-400 mt-1">invoices paid</p>
+    </div>
+    <div class="card-tw p-5 animate-slide-up delay-150">
+      <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Pending</p>
+      <p class="text-2xl font-bold text-amber-600 mt-1">{{ pendingCount }}</p>
+      <p class="text-xs text-slate-400 mt-1">awaiting payment</p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="card-tw p-3 mb-4">
+    <div class="flex flex-wrap gap-2 items-center">
+      <div class="relative flex-1 min-w-48">
+        <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+        <input class="input-tw pl-8 text-sm" placeholder="Search vehicle number…" [(ngModel)]="searchVehicle" />
+      </div>
+      <select class="input-tw w-36 text-sm" [(ngModel)]="filterStatus" (change)="load()">
+        <option value="">All Statuses</option>
+        <option value="PENDING">Pending</option>
+        <option value="PAID">Paid</option>
+        <option value="CANCELLED">Cancelled</option>
+      </select>
+      <button (click)="filterStatus=''; searchVehicle=''; load()"
+        class="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 px-3 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition-all">
+        <i class="bi bi-x-circle"></i> Clear
+      </button>
+      <span class="text-xs text-slate-400 ml-auto">{{ filtered.length }} result(s)</span>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card-tw overflow-hidden">
+    @if (loading()) {
+      <div class="flex justify-center items-center py-16">
+        <svg class="animate-spin h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+        </svg>
+      </div>
+    } @else if (filtered.length === 0) {
+      <div class="text-center py-16 text-slate-400">
+        <i class="bi bi-receipt text-4xl block mb-2"></i>
+        <p class="text-sm">No invoices found</p>
+      </div>
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-xs uppercase text-slate-400 bg-slate-50 border-b border-slate-100">
+              <th class="text-left px-5 py-3 font-semibold">Invoice #</th>
+              <th class="text-left px-5 py-3 font-semibold">Vehicle</th>
+              <th class="text-left px-5 py-3 font-semibold">Type</th>
+              <th class="text-left px-5 py-3 font-semibold">Duration</th>
+              <th class="text-left px-5 py-3 font-semibold">Amount</th>
+              <th class="text-left px-5 py-3 font-semibold">Payment</th>
+              <th class="text-left px-5 py-3 font-semibold">Status</th>
+              <th class="text-left px-5 py-3 font-semibold">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (inv of filtered; track inv.invoiceId) {
+              <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                <td class="px-5 py-3 font-semibold text-slate-700">#{{ inv.invoiceId }}</td>
+                <td class="px-5 py-3 font-semibold text-slate-700">{{ inv.vehicleNumber }}</td>
+                <td class="px-5 py-3">
+                  @if (inv.slotType === '2W') {
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-sky-100 text-sky-700">2W</span>
+                  } @else {
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">4W</span>
+                  }
+                </td>
+                <td class="px-5 py-3 text-xs text-slate-500">{{ formatDuration(inv.durationMinutes) }}</td>
+                <td class="px-5 py-3 font-semibold text-slate-800">₹{{ inv.amount | number:'1.2-2' }}</td>
+                <td class="px-5 py-3 text-xs text-slate-500">{{ inv.paymentMethod || '—' }}</td>
+                <td class="px-5 py-3">
+                  @if (inv.status === 'PAID') { <span class="badge-completed">Paid</span> }
+                  @else if (inv.status === 'PENDING') { <span class="badge-pending">Pending</span> }
+                  @else { <span class="badge-cancelled">Cancelled</span> }
+                </td>
+                <td class="px-5 py-3 text-xs text-slate-500">{{ inv.createdAt | date:'dd MMM, HH:mm' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Pay Modal -->
+@if (showPayModal()) {
+  <div class="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm animate-fade-in" (click)="showPayModal.set(false)"></div>
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm animate-scale-in">
+      <div class="flex items-center justify-between px-6 pt-5 pb-4 border-b border-slate-100">
+        <h3 class="font-bold text-slate-800">Process Payment</h3>
+        <button (click)="showPayModal.set(false)" class="text-slate-400 hover:text-slate-600">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        @if (selectedInvoice()) {
+          <div class="bg-slate-50 rounded-xl p-4 space-y-2 text-sm">
+            <div class="flex justify-between">
+              <span class="text-slate-500">Invoice</span>
+              <span class="font-semibold">#{{ selectedInvoice()!.invoiceId }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500">Vehicle</span>
+              <span class="font-semibold">{{ selectedInvoice()!.vehicleNumber }}</span>
+            </div>
+            <div class="flex justify-between border-t border-slate-200 pt-2">
+              <span class="font-semibold text-slate-700">Amount</span>
+              <span class="font-bold text-emerald-600">₹{{ selectedInvoice()!.amount | number:'1.2-2' }}</span>
+            </div>
+          </div>
+        }
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-2">Payment Method</label>
+          <div class="grid grid-cols-4 gap-2">
+            @for (method of ['UPI','CASH','CARD','ONLINE']; track method) {
+              <button type="button"
+                (click)="payForm.paymentMethod = $any(method)"
+                class="py-2 rounded-lg text-sm font-medium border transition-all duration-200"
+                [class.bg-indigo-600]="payForm.paymentMethod === method"
+                [class.text-white]="payForm.paymentMethod === method"
+                [class.border-indigo-600]="payForm.paymentMethod === method"
+                [class.bg-white]="payForm.paymentMethod !== method"
+                [class.text-slate-600]="payForm.paymentMethod !== method"
+                [class.border-slate-200]="payForm.paymentMethod !== method">
+                {{ method }}
+              </button>
+            }
+          </div>
+        </div>
+        @if (error()) {
+          <div class="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{{ error() }}</div>
+        }
+      </div>
+      <div class="flex justify-end gap-2 px-6 pb-5">
+        <button (click)="showPayModal.set(false)" class="btn-secondary-tw">Cancel</button>
+        <button (click)="pay()" [disabled]="saving()"
+          class="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-200 disabled:opacity-60 text-sm">
+          @if (saving()) {
+            <svg class="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+            </svg>
+          }
+          Confirm Payment
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- QR Modal -->
+@if (showQrModal()) {
+  <div class="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm animate-fade-in" (click)="showQrModal.set(false)"></div>
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm animate-scale-in text-center p-8">
+      <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i class="bi bi-check-circle-fill text-3xl"></i>
+      </div>
+      <h3 class="font-bold text-slate-800 text-lg mb-1">Invoice Generated</h3>
+      @if (qrData()) {
+        <p class="text-slate-500 text-sm mb-4">Invoice #{{ qrData()!.invoiceId }} · ₹{{ qrData()!.amount | number:'1.2-2' }}</p>
+        @if (qrData()!.paymentQRCodeBase64) {
+          <img [src]="'data:image/png;base64,' + qrData()!.paymentQRCodeBase64"
+            alt="QR" class="w-40 h-40 mx-auto rounded-xl border border-slate-100 shadow-sm mb-4" />
+        }
+      }
+      <button (click)="showQrModal.set(false)" class="btn-primary-tw w-full">Close</button>
+    </div>
+  </div>
+}

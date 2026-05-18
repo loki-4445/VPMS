@@ -1,0 +1,130 @@
+<div class="animate-fade-in max-w-2xl mx-auto">
+  <div class="mb-6">
+    <h1 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+      <i class="bi bi-person-circle text-indigo-600"></i> My Profile
+    </h1>
+    <p class="text-sm text-slate-500 mt-0.5">View and update your account details</p>
+  </div>
+
+  @if (success()) {
+    <div class="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg px-4 py-3 mb-4 text-sm animate-fade-in">
+      <i class="bi bi-check-circle-fill text-emerald-500"></i> {{ success() }}
+      <button (click)="success.set('')" class="ml-auto"><i class="bi bi-x-lg"></i></button>
+    </div>
+  }
+  @if (error()) {
+    <div class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 rounded-lg px-4 py-3 mb-4 text-sm animate-fade-in">
+      <i class="bi bi-exclamation-circle-fill text-red-500"></i> {{ error() }}
+      <button (click)="error.set('')" class="ml-auto"><i class="bi bi-x-lg"></i></button>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="flex justify-center py-16">
+      <svg class="animate-spin h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+      </svg>
+    </div>
+  } @else if (profile()) {
+    <div class="card-tw overflow-hidden animate-slide-up">
+      <!-- Profile header -->
+      <div class="gradient-primary p-6 text-white flex items-center gap-4">
+        <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-3xl font-bold">
+          {{ profile()!.name.charAt(0).toUpperCase() }}
+        </div>
+        <div>
+          <h2 class="text-xl font-bold">{{ profile()!.name }}</h2>
+          <p class="text-white/70 text-sm">{{ profile()!.email }}</p>
+          <span class="inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/20 text-white">
+            <i class="bi bi-shield-fill"></i> {{ profile()!.role }}
+          </span>
+        </div>
+        <div class="ml-auto">
+          @if (!editMode()) {
+            <button (click)="editMode.set(true)"
+              class="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded-lg text-sm font-medium transition-all">
+              <i class="bi bi-pencil"></i> Edit Profile
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Profile details -->
+      <div class="p-6">
+        @if (!editMode()) {
+          <div class="space-y-4">
+            <div class="flex items-center gap-3 py-3 border-b border-slate-100">
+              <div class="w-8 h-8 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center">
+                <i class="bi bi-person text-sm"></i>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400">Full Name</p>
+                <p class="font-semibold text-slate-800 text-sm">{{ profile()!.name }}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 py-3 border-b border-slate-100">
+              <div class="w-8 h-8 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center">
+                <i class="bi bi-envelope text-sm"></i>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400">Email Address</p>
+                <p class="font-semibold text-slate-800 text-sm">{{ profile()!.email }}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 py-3 border-b border-slate-100">
+              <div class="w-8 h-8 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center">
+                <i class="bi bi-telephone text-sm"></i>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400">Phone Number</p>
+                <p class="font-semibold text-slate-800 text-sm">{{ profile()!.phoneNumber }}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 py-3">
+              <div class="w-8 h-8 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center">
+                <i class="bi bi-calendar text-sm"></i>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400">Member Since</p>
+                <p class="font-semibold text-slate-800 text-sm">{{ profile()!.createdAt | date:'dd MMMM yyyy' }}</p>
+              </div>
+            </div>
+          </div>
+        } @else {
+          <form (ngSubmit)="save()" class="space-y-4">
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1">Full Name</label>
+              <input class="input-tw" [(ngModel)]="form.name" name="name" placeholder="Your full name" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1">Email Address</label>
+              <input class="input-tw bg-slate-50 cursor-not-allowed" [value]="profile()!.email" disabled />
+              <p class="text-xs text-slate-400 mt-1">Email cannot be changed</p>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1">Phone Number</label>
+              <input class="input-tw" [(ngModel)]="form.phoneNumber" name="phone" placeholder="10-digit number" maxlength="10" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1">New Password <span class="text-slate-400 font-normal">(leave blank to keep current)</span></label>
+              <input class="input-tw" type="password" [(ngModel)]="form.password" name="password" placeholder="New password" autocomplete="new-password" />
+            </div>
+            <div class="flex gap-2 pt-2">
+              <button type="button" (click)="cancelEdit()" class="btn-secondary-tw">Cancel</button>
+              <button type="submit" [disabled]="saving()" class="btn-primary-tw flex items-center gap-1.5">
+                @if (saving()) {
+                  <svg class="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                  </svg>
+                }
+                Save Changes
+              </button>
+            </div>
+          </form>
+        }
+      </div>
+    </div>
+  }
+</div>
