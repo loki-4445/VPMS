@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+﻿import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { VehicleLogService } from '../../core/services/vehicle-log.service';
@@ -16,7 +16,7 @@ import { ReservationResponse } from '../../models/reservation.models';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './vehicle-logs.component.html',
-  styleUrls: ['./vehicle-logs.component.scss']
+  styleUrls: ['./vehicle-logs.component.css']
 })
 export class VehicleLogsComponent implements OnInit {
   private svc = inject(VehicleLogService);
@@ -44,9 +44,19 @@ export class VehicleLogsComponent implements OnInit {
   showExitModal = signal(false);
   showInvoiceModal = signal(false);
 
-  // Entry form — userId auto-filled from auth
-  entryForm = { vehicleNumber: '', slotId: 0 };
+  // Entry form — two modes
+  entryMode: 'reserved' | 'walkin' = 'reserved';
+
+  // Reserved mode fields
+  reservedVehicleNumber = '';
+  reservedSlotId: number | null = null;
+  reservedReservationId: number | null = null;
   reservationSelected = false;
+
+  // Walk-in mode fields
+  walkinVehicleNumber = '';
+  walkinSlotId: number = 0;
+
   exitVehicleNumber = '';
 
   // After exit: invoice generation
@@ -61,9 +71,7 @@ export class VehicleLogsComponent implements OnInit {
 
   load() {
     this.loading.set(true);
-    // STAFF can only access /logs/active; ADMIN gets all
-    const obs = this.auth.isAdmin() ? this.svc.getAll() : this.svc.getActive();
-    obs.subscribe({
+    this.svc.getAll().subscribe({
       next: data => { this.logs.set(data); this.loading.set(false); },
       error: () => { this.error.set('Failed to load logs.'); this.loading.set(false); }
     });
@@ -79,10 +87,17 @@ export class VehicleLogsComponent implements OnInit {
   }
 
   openEntryModal() {
-    this.entryForm = { vehicleNumber: '', slotId: 0 };
-    this.reservationSelected = false;
+    // Reset both modes
+    this.entryMode = 'reserved';
     this.entrySearch = '';
     this.showEntryDropdown = false;
+    this.reservedVehicleNumber = '';
+    this.reservedSlotId = null;
+    this.reservedReservationId = null;
+    this.reservationSelected = false;
+    this.walkinVehicleNumber = '';
+    this.walkinSlotId = 0;
+
     this.resSvc.getActive().subscribe({
       next: res => this.activeReservations.set(res),
       error: () => this.activeReservations.set([])
@@ -95,15 +110,15 @@ export class VehicleLogsComponent implements OnInit {
     this.error.set(''); this.success.set('');
   }
 
-  selectReservation(id: string) {
-    if (!id) { this.entryForm = { vehicleNumber: '', slotId: 0 }; return; }
-    const res = this.activeReservations().find(r => r.id === +id);
-    if (res) { this.entryForm.vehicleNumber = res.vehicleNumber; this.entryForm.slotId = res.slotId; }
+  switchEntryMode(mode: 'reserved' | 'walkin') {
+    this.entryMode = mode;
+    this.error.set('');
   }
 
   selectReservationFromDropdown(res: import('../../models/reservation.models').ReservationResponse) {
-    this.entryForm.vehicleNumber = res.vehicleNumber;
-    this.entryForm.slotId = res.slotId;
+    this.reservedVehicleNumber = res.vehicleNumber;
+    this.reservedSlotId = res.slotId;
+    this.reservedReservationId = res.id;
     this.entrySearch = res.vehicleNumber;
     this.reservationSelected = true;
     this.showEntryDropdown = false;
@@ -111,7 +126,9 @@ export class VehicleLogsComponent implements OnInit {
 
   clearEntrySearch() {
     this.entrySearch = '';
-    this.entryForm = { vehicleNumber: '', slotId: 0 };
+    this.reservedVehicleNumber = '';
+    this.reservedSlotId = null;
+    this.reservedReservationId = null;
     this.reservationSelected = false;
     this.showEntryDropdown = false;
   }
@@ -149,12 +166,14 @@ export class VehicleLogsComponent implements OnInit {
   }
 
   get filteredReservations() {
-    // exclude vehicles already inside (have an ACTIVE log entry)
+    // exclude vehicles already parked (ACTIVE log entry exists)
     const parked = new Set(this.logs().filter(l => l.status === 'ACTIVE').map(l => l.vehicleNumber));
     const q = this.entrySearch.toLowerCase();
     return this.activeReservations()
       .filter(r => !parked.has(r.vehicleNumber))
-      .filter(r => !q || r.vehicleNumber.toLowerCase().includes(q) || String(r.slotId).includes(q));
+      .filter(r => !q || r.vehicleNumber.toLowerCase().includes(q)
+                       || String(r.slotId).includes(q)
+                       || (r.userName ?? '').toLowerCase().includes(q));
   }
 
   get filteredActiveLogs() {
@@ -165,20 +184,32 @@ export class VehicleLogsComponent implements OnInit {
   }
 
   logEntry() {
-    if (!this.entryForm.vehicleNumber || !this.entryForm.slotId) {
-      this.error.set('Vehicle number and slot are required.'); return;
-    }
     const userId = this.auth.getUserId();
     if (!userId) { this.error.set('User session expired. Please log in again.'); return; }
 
+    let req: import('../../models/vehicle-log.models').EntryRequest;
+
+    if (this.entryMode === 'reserved') {
+      if (!this.reservedVehicleNumber || !this.reservedReservationId) {
+        this.error.set('Please select a reserved vehicle from the list.'); return;
+      }
+      req = {
+        vehicleNumber: this.reservedVehicleNumber,
+        slotId: this.reservedSlotId ?? undefined,
+        reservationId: this.reservedReservationId,
+        userId
+      };
+    } else {
+      const vn = this.walkinVehicleNumber.trim().toUpperCase();
+      if (!vn) { this.error.set('Vehicle number is required.'); return; }
+      if (!this.walkinSlotId) { this.error.set('Please select an available slot.'); return; }
+      req = { vehicleNumber: vn, slotId: this.walkinSlotId, userId };
+    }
+
     this.saving.set(true); this.error.set('');
-    this.svc.logEntry({
-      vehicleNumber: this.entryForm.vehicleNumber,
-      slotId: this.entryForm.slotId,
-      userId
-    }).subscribe({
+    this.svc.logEntry(req).subscribe({
       next: () => {
-        this.success.set('Vehicle entry logged.');
+        this.success.set('Vehicle entry logged successfully.');
         this.saving.set(false); this.showEntryModal.set(false); this.load();
       },
       error: err => { this.error.set(err.error?.message || 'Entry failed.'); this.saving.set(false); }
@@ -202,7 +233,7 @@ export class VehicleLogsComponent implements OnInit {
     });
   }
 
-  // Step 1 → Step 2: generate invoice, wait for staff confirmation
+  // Step 1 â†’ Step 2: generate invoice, wait for staff confirmation
   proceedToConfirm() {
     const log = this.exitedLog();
     if (!log) return;
@@ -220,7 +251,7 @@ export class VehicleLogsComponent implements OnInit {
     });
   }
 
-  // Step 2 → Step 3: staff confirmed payment received
+  // Step 2 â†’ Step 3: staff confirmed payment received
   confirmAndPay() {
     const invoice = this.generatedInvoice();
     if (!invoice) return;
@@ -235,8 +266,8 @@ export class VehicleLogsComponent implements OnInit {
     });
   }
 
-  // Step 2 → Step 1: go back to method selection
-  // Note: invoice already created as PENDING — will appear in Invoices tab
+  // Step 2 â†’ Step 1: go back to method selection
+  // Note: invoice already created as PENDING â€” will appear in Invoices tab
   backToMethodSelect() {
     this.awaitingConfirmation.set(false);
     this.generatedInvoice.set(null);
@@ -253,8 +284,9 @@ export class VehicleLogsComponent implements OnInit {
   get activeCount() { return this.logs().filter(l => l.status === 'ACTIVE').length; }
   get completedCount() { return this.logs().filter(l => l.status === 'COMPLETED').length; }
 
-  formatDuration(mins?: number) {
-    if (!mins) return '—';
+  formatDuration(mins?: number | null) {
+    if (mins === undefined || mins === null) return '—';
+    if (mins === 0) return '< 1 min';
     const h = Math.floor(mins / 60), m = mins % 60;
     return h > 0 ? `${h}h ${m}m` : `${m}m`;
   }

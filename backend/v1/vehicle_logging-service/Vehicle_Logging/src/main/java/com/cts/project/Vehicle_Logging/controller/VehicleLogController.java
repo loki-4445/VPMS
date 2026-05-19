@@ -131,11 +131,11 @@ public class VehicleLogController {
 
 
 
-    @Operation(summary = "Get all logs — full history", description = "ADMIN only")
-    @GetMapping("/")
-    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Get all logs — full history (active + completed)", description = "ADMIN and STAFF")
+    @GetMapping({"", "/"})
+    @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     public ResponseEntity<List<VehicleLogResponse>> getAllLogs() {
-        log.info("GET /logs/");
+        log.info("GET /logs");
         return ResponseEntity.ok(vehicleLogService.getAllLogs());
     }
 }

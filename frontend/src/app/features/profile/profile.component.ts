@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+﻿import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../core/services/user.service';
@@ -10,7 +10,7 @@ import { UserResponse } from '../../models/user.models';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.scss']
+  styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
   private userSvc = inject(UserService);
@@ -74,7 +74,7 @@ export class ProfileComponent implements OnInit {
       this.profile.set({ ...p, name: this.form.name, phoneNumber: this.form.phoneNumber });
     },
     error: err => {
-      console.error('Update error:', err); // ← add this to see the real error
+      console.error('Update error:', err); // â† add this to see the real error
       this.error.set(err.error?.message || err.message || 'Update failed.');
       this.saving.set(false);
     }

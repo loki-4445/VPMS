@@ -1,37 +1,33 @@
-<header class="h-14 bg-indigo-700 shadow-lg flex items-center px-4 gap-4 z-40 relative">
+<header class="app-navbar">
   <!-- Brand -->
-  <a routerLink="/dashboard" class="flex items-center gap-2 text-white no-underline shrink-0">
-    <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-      <i class="bi bi-p-circle-fill text-white text-base"></i>
+  <a routerLink="/dashboard" class="brand-link">
+    <div class="brand-icon">
+      <i class="bi bi-p-circle-fill"></i>
     </div>
-    <span class="font-bold text-base tracking-wide">VPMS</span>
-    <span class="hidden md:inline text-white/60 text-xs font-normal">Vehicle Parking Management</span>
+    <span class="brand-name">VPMS</span>
+    <span class="brand-tagline">Vehicle Parking Management</span>
   </a>
 
-  <div class="flex-1"></div>
+  <div class="nav-spacer"></div>
 
-  <!-- User info -->
-  <div class="flex items-center gap-2">
-    <div class="hidden sm:flex items-center gap-2">
-      <span class="flex items-center gap-1.5 bg-white/15 text-white text-xs font-medium px-3 py-1.5 rounded-full">
+  <!-- User info & logout -->
+  <div class="nav-actions">
+    <div class="user-info">
+      <span class="user-email-chip">
         <i class="bi bi-person-circle"></i>
         {{ auth.getEmail() }}
       </span>
-      <span class="flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-full"
-        [class.bg-purple-200]="auth.isAdmin()"
-        [class.text-purple-900]="auth.isAdmin()"
-        [class.bg-blue-200]="auth.isStaff()"
-        [class.text-blue-900]="auth.isStaff()"
-        [class.bg-teal-200]="auth.isCustomer()"
-        [class.text-teal-900]="auth.isCustomer()">
+      <span class="role-chip"
+        [class.role-admin]="auth.isAdmin()"
+        [class.role-staff]="auth.isStaff()"
+        [class.role-customer]="auth.isCustomer()">
         <i class="bi bi-shield-fill"></i>
         {{ auth.getRole() }}
       </span>
     </div>
-    <button (click)="logout()"
-      class="flex items-center gap-1.5 text-white/90 hover:text-white hover:bg-white/20 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all duration-200 border border-white/20">
+    <button (click)="logout()" class="logout-btn">
       <i class="bi bi-box-arrow-right"></i>
-      <span class="hidden sm:inline">Logout</span>
+      <span class="logout-text">Logout</span>
     </button>
   </div>
 </header>

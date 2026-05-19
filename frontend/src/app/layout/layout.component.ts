@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from '../shared/navbar/navbar.component';
 import { SidebarComponent } from '../shared/sidebar/sidebar.component';
@@ -8,6 +8,6 @@ import { SidebarComponent } from '../shared/sidebar/sidebar.component';
   standalone: true,
   imports: [RouterOutlet, NavbarComponent, SidebarComponent],
   templateUrl: './layout.component.html',
-  styleUrls: ['./layout.component.scss']
+  styleUrls: ['./layout.component.css']
 })
 export class LayoutComponent {}

@@ -1,60 +1,59 @@
-<div class="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-800 flex items-center justify-center p-4">
-  <div class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden flex animate-scale-in">
+<div class="auth-page">
+  <div class="auth-card animate-scale-in">
 
     <!-- Left brand panel -->
-    <div class="hidden md:flex w-5/12 gradient-primary flex-col items-center justify-center p-10 text-white">
-      <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-6 shadow-glow">
-        <i class="bi bi-p-circle-fill text-4xl"></i>
+    <div class="auth-brand gradient-primary">
+      <div class="auth-brand-icon shadow-glow">
+        <i class="bi bi-p-circle-fill"></i>
       </div>
-      <h2 class="text-2xl font-bold text-center mb-2">Join VPMS Today</h2>
-      <p class="text-white/70 text-center text-sm mb-6">Create your free customer account and manage your parking effortlessly</p>
-      <ul class="space-y-3 text-sm">
-        <li class="flex items-center gap-2 animate-slide-in-right delay-100">
-          <i class="bi bi-check-circle-fill text-green-400"></i>
+      <h2 class="auth-brand-title">Join VPMS Today</h2>
+      <p class="auth-brand-sub">Create your free customer account and manage your parking effortlessly</p>
+      <ul class="auth-brand-features">
+        <li class="auth-feature animate-slide-in-right delay-100">
+          <i class="bi bi-check-circle-fill feature-check"></i>
           <span>Book parking slots in advance</span>
         </li>
-        <li class="flex items-center gap-2 animate-slide-in-right delay-200">
-          <i class="bi bi-check-circle-fill text-green-400"></i>
+        <li class="auth-feature animate-slide-in-right delay-200">
+          <i class="bi bi-check-circle-fill feature-check"></i>
           <span>View &amp; manage your reservations</span>
         </li>
-        <li class="flex items-center gap-2 animate-slide-in-right delay-300">
-          <i class="bi bi-check-circle-fill text-green-400"></i>
+        <li class="auth-feature animate-slide-in-right delay-300">
+          <i class="bi bi-check-circle-fill feature-check"></i>
           <span>Digital invoices &amp; QR payments</span>
         </li>
-        <li class="flex items-center gap-2 animate-slide-in-right delay-400">
-          <i class="bi bi-check-circle-fill text-green-400"></i>
+        <li class="auth-feature animate-slide-in-right delay-400">
+          <i class="bi bi-check-circle-fill feature-check"></i>
           <span>2-Wheeler &amp; 4-Wheeler support</span>
         </li>
       </ul>
     </div>
 
     <!-- Right form panel -->
-    <div class="flex-1 flex flex-col justify-center p-8 md:p-10 overflow-y-auto">
+    <div class="auth-form-panel">
       <!-- Mobile logo -->
-      <div class="flex items-center gap-2 mb-4 md:hidden">
-        <i class="bi bi-p-circle-fill text-2xl text-indigo-600"></i>
-        <span class="font-bold text-lg text-indigo-600">VPMS</span>
+      <div class="auth-mobile-logo">
+        <i class="bi bi-p-circle-fill auth-mobile-icon"></i>
+        <span class="auth-mobile-brand">VPMS</span>
       </div>
 
-      <h3 class="text-2xl font-bold text-slate-800 mb-1">Create account</h3>
-      <p class="text-slate-500 text-sm mb-5">Fill in your details to get started</p>
+      <h3 class="auth-form-title">Create account</h3>
+      <p class="auth-form-sub">Fill in your details to get started</p>
 
       @if (error()) {
-        <div class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 rounded-lg px-4 py-3 mb-4 text-sm animate-fade-in">
-          <i class="bi bi-exclamation-circle-fill text-red-500 shrink-0"></i>
+        <div class="alert alert-error animate-fade-in">
+          <i class="bi bi-exclamation-circle-fill" style="flex-shrink:0"></i>
           <span>{{ error() }}</span>
         </div>
       }
 
-      <form (ngSubmit)="register()" novalidate class="space-y-3">
+      <form (ngSubmit)="register()" novalidate class="auth-form">
+
         <!-- Full Name -->
         <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1">Full Name</label>
-          <div class="flex rounded-lg border border-slate-200 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-200 transition-all duration-200 overflow-hidden">
-            <span class="flex items-center px-3 bg-slate-50 border-r border-slate-200">
-              <i class="bi bi-person text-slate-400"></i>
-            </span>
-            <input type="text" class="flex-1 px-3 py-2.5 text-sm outline-none bg-white"
+          <label class="form-label">Full Name</label>
+          <div class="auth-input-group">
+            <span class="auth-input-prefix"><i class="bi bi-person"></i></span>
+            <input type="text" class="auth-input"
               placeholder="Your full name"
               [(ngModel)]="form.name" name="name" required autocomplete="name" />
           </div>
@@ -62,12 +61,10 @@
 
         <!-- Email -->
         <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1">Email Address</label>
-          <div class="flex rounded-lg border border-slate-200 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-200 transition-all duration-200 overflow-hidden">
-            <span class="flex items-center px-3 bg-slate-50 border-r border-slate-200">
-              <i class="bi bi-envelope text-slate-400"></i>
-            </span>
-            <input type="email" class="flex-1 px-3 py-2.5 text-sm outline-none bg-white"
+          <label class="form-label">Email Address</label>
+          <div class="auth-input-group">
+            <span class="auth-input-prefix"><i class="bi bi-envelope"></i></span>
+            <input type="email" class="auth-input"
               placeholder="you@example.com"
               [(ngModel)]="form.email" name="email" required autocomplete="email" />
           </div>
@@ -75,12 +72,10 @@
 
         <!-- Phone -->
         <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1">Phone Number</label>
-          <div class="flex rounded-lg border border-slate-200 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-200 transition-all duration-200 overflow-hidden">
-            <span class="flex items-center px-3 bg-slate-50 border-r border-slate-200">
-              <i class="bi bi-telephone text-slate-400"></i>
-            </span>
-            <input type="tel" class="flex-1 px-3 py-2.5 text-sm outline-none bg-white"
+          <label class="form-label">Phone Number</label>
+          <div class="auth-input-group">
+            <span class="auth-input-prefix"><i class="bi bi-telephone"></i></span>
+            <input type="tel" class="auth-input"
               placeholder="10-digit mobile number"
               [(ngModel)]="form.phoneNumber" name="phoneNumber"
               maxlength="10" required autocomplete="tel" />
@@ -89,17 +84,14 @@
 
         <!-- Password -->
         <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1">Password</label>
-          <div class="flex rounded-lg border border-slate-200 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-200 transition-all duration-200 overflow-hidden">
-            <span class="flex items-center px-3 bg-slate-50 border-r border-slate-200">
-              <i class="bi bi-lock text-slate-400"></i>
-            </span>
+          <label class="form-label">Password</label>
+          <div class="auth-input-group">
+            <span class="auth-input-prefix"><i class="bi bi-lock"></i></span>
             <input [type]="showPassword() ? 'text' : 'password'"
-              class="flex-1 px-3 py-2.5 text-sm outline-none bg-white"
+              class="auth-input"
               placeholder="Min. 6 characters"
               [(ngModel)]="form.password" name="password" required autocomplete="new-password" />
-            <button type="button"
-              class="flex items-center px-3 bg-slate-50 border-l border-slate-200 text-slate-400 hover:text-slate-600 transition-colors"
+            <button type="button" class="auth-input-suffix"
               (click)="showPassword.update(v => !v)">
               <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()"></i>
             </button>
@@ -108,44 +100,34 @@
 
         <!-- Confirm Password -->
         <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1">Confirm Password</label>
-          <div class="flex rounded-lg border focus-within:ring-2 transition-all duration-200 overflow-hidden"
-            [class.border-slate-200]="!passwordsMismatch && !passwordsMatch"
-            [class.border-red-300]="passwordsMismatch"
-            [class.focus-within:border-red-400]="passwordsMismatch"
-            [class.border-green-300]="passwordsMatch"
-            [class.focus-within:ring-green-200]="passwordsMatch"
-            [class.focus-within:border-indigo-500]="!passwordsMismatch && !passwordsMatch"
-            [class.focus-within:ring-indigo-200]="!passwordsMismatch && !passwordsMatch">
-            <span class="flex items-center px-3 bg-slate-50 border-r border-slate-200">
-              <i class="bi bi-lock-fill text-slate-400"></i>
-            </span>
+          <label class="form-label">Confirm Password</label>
+          <div class="auth-input-group"
+            [class.input-state--error]="passwordsMismatch"
+            [class.input-state--ok]="passwordsMatch">
+            <span class="auth-input-prefix"><i class="bi bi-lock-fill"></i></span>
             <input [type]="showConfirm() ? 'text' : 'password'"
-              class="flex-1 px-3 py-2.5 text-sm outline-none bg-white"
+              class="auth-input"
               placeholder="Re-enter your password"
               [(ngModel)]="form.confirmPassword" name="confirmPassword"
               required autocomplete="new-password" />
-            <button type="button"
-              class="flex items-center px-3 bg-slate-50 border-l border-slate-200 text-slate-400 hover:text-slate-600 transition-colors"
+            <button type="button" class="auth-input-suffix"
               (click)="showConfirm.update(v => !v)">
               <i class="bi" [class.bi-eye]="!showConfirm()" [class.bi-eye-slash]="showConfirm()"></i>
             </button>
           </div>
           @if (passwordsMismatch) {
-            <p class="text-red-500 text-xs mt-1"><i class="bi bi-x-circle me-1"></i>Passwords do not match</p>
+            <p class="form-error"><i class="bi bi-x-circle" style="margin-right:0.25rem"></i>Passwords do not match</p>
           }
           @if (passwordsMatch) {
-            <p class="text-green-600 text-xs mt-1"><i class="bi bi-check-circle me-1"></i>Passwords match</p>
+            <p class="form-ok"><i class="bi bi-check-circle" style="margin-right:0.25rem"></i>Passwords match</p>
           }
         </div>
 
-        <button type="submit"
-          class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
-          [disabled]="loading()">
+        <button type="submit" class="auth-submit-btn" [disabled]="loading()">
           @if (loading()) {
-            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+            <svg class="animate-spin btn-spinner" fill="none" viewBox="0 0 24 24">
+              <circle class="spinner-track" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="spinner-fill" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
             </svg>
             Creating account...
           } @else {
@@ -155,9 +137,9 @@
         </button>
       </form>
 
-      <p class="mt-5 text-center text-sm text-slate-500">
+      <p class="auth-footer-text">
         Already have an account?
-        <a routerLink="/login" class="ml-1 font-semibold text-indigo-600 hover:text-indigo-800 transition-colors">Sign in</a>
+        <a routerLink="/login" class="auth-footer-link">Sign in</a>
       </p>
     </div>
   </div>

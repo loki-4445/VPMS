@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+﻿import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../core/services/user.service';
@@ -9,7 +9,7 @@ import { UserResponse } from '../../models/user.models';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './users.component.html',
-  styleUrls: ['./users.component.scss']
+  styleUrls: ['./users.component.css']
 })
 export class UsersComponent implements OnInit {
   private svc = inject(UserService);

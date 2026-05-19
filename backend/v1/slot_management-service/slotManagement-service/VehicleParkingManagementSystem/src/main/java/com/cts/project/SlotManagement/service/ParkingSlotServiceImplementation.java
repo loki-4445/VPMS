@@ -72,7 +72,8 @@ public class ParkingSlotServiceImplementation implements ParkingSlotService {
     public List<SlotResponseDTO> getAvailableSlots(String type){
 
         if(type != null){
-            List<ParkingSlot> parkingSlotList =  parkingSlotRepository.findByTypeAndOccupiedStatus(type,0);
+            // status = -1 means AVAILABLE (not reserved, not occupied)
+            List<ParkingSlot> parkingSlotList =  parkingSlotRepository.findByTypeAndOccupiedStatus(type, -1);
             return parkingSlotListToSlotResponseDTOList(parkingSlotList);
 
         }else{

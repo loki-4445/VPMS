@@ -16,8 +16,16 @@ public class EntryRequest {
     )
     private String vehicleNumber;
 
+    /** Slot id — required for walk-in, ignored for reserved (slot taken from reservation). */
     private Long slotId;
 
     @NotNull(message = "User ID is required")
     private Long userId;
+
+    /**
+     * Optional: ID of the active reservation for this vehicle.
+     * When present  → PATH A (reserved): slot is taken from the reservation record.
+     * When absent   → PATH B (walk-in):  slotId in this request must be free (-1).
+     */
+    private Long reservationId;
 }

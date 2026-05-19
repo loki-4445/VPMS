@@ -1,8 +1,8 @@
-<div class="flex flex-col h-screen overflow-hidden">
+<div class="app-shell">
   <app-navbar></app-navbar>
-  <div class="flex flex-1 overflow-hidden">
+  <div class="app-body">
     <app-sidebar></app-sidebar>
-    <main class="flex-1 overflow-y-auto bg-slate-50 p-4 md:p-6">
+    <main class="page-content">
       <router-outlet></router-outlet>
     </main>
   </div>

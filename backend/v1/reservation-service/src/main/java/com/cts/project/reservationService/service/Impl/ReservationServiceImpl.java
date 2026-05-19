@@ -64,8 +64,36 @@ public class ReservationServiceImpl implements ReservationService {
         boolean alreadyBooked = reservationRepository.existsOverlappingReservation(
                 slotId, reservation.getStartTime(), effectiveEndTime);
         if (alreadyBooked) {
-            log.warn("Slot {} already booked for requested time", slotId);
-            throw new SlotAlreadyBookedException(slotId);
+            // Before rejecting, verify the slot's actual physical status.
+            // If the slot is physically AVAILABLE (-1), the CONFIRMED reservation(s)
+            // are stale — the vehicle already left but the reservation was never
+            // marked COMPLETED (e.g. the service was down during vehicle exit).
+            // Auto-complete those stale reservations and allow the new booking.
+            boolean slotPhysicallyFree = false;
+            try {
+                ParkingResponse currentSlot = parkingClient.getSlotById(slotId);
+                slotPhysicallyFree = (currentSlot != null && Integer.valueOf(-1).equals(currentSlot.getOccupiedStatus()));
+            } catch (Exception e) {
+                log.warn("Could not fetch slot {} status during overlap check. Reason: {}", slotId, e.getMessage());
+            }
+
+            if (slotPhysicallyFree) {
+                // Auto-complete all stale CONFIRMED reservations for this slot
+                log.info("Slot {} is physically available but has stale CONFIRMED reservation(s). Auto-completing them.", slotId);
+                reservationRepository.findBySlotId(slotId).stream()
+                        .filter(r -> STATUS_CONFIRMED.equals(r.getStatus()))
+                        .forEach(stale -> {
+                            stale.setStatus(STATUS_COMPLETED);
+                            if (stale.getEndTime() == null) {
+                                stale.setEndTime(LocalDateTime.now());
+                            }
+                            reservationRepository.save(stale);
+                            log.info("Auto-completed stale reservation id={} for slot={}", stale.getId(), slotId);
+                        });
+            } else {
+                log.warn("Slot {} already booked for requested time", slotId);
+                throw new SlotAlreadyBookedException(slotId);
+            }
         }
         // Mark slot as reserved (0) — becomes occupied (1) only when vehicle physically enters
         parkingClient.updateSlotStatus(slotId, 0);
@@ -142,7 +170,14 @@ public class ReservationServiceImpl implements ReservationService {
         if (updatedData.getEndTime() != null) {
             existing.setEndTime(updatedData.getEndTime());
             existing.setStatus(STATUS_COMPLETED);
-            parkingClient.updateSlotStatus(existing.getSlotId(), -1);
+            // Wrap slot-free in try-catch: vehicle-logging-service may have already freed it.
+            // A circuit-breaker CallNotPermittedException must NOT roll back the @Transactional.
+            try {
+                parkingClient.updateSlotStatus(existing.getSlotId(), -1);
+            } catch (Exception e) {
+                log.warn("Could not free slot {} during reservation completion (may already be freed). Reason: {}",
+                        existing.getSlotId(), e.getMessage());
+            }
         }
         if (updatedData.getStatus() != null && updatedData.getEndTime() == null) {
             existing.setStatus(updatedData.getStatus());
