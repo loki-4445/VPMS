@@ -1,7 +1,8 @@
 export interface EntryRequest {
   vehicleNumber: string;
-  slotId: number;
+  slotId?: number | null;
   userId: number;
+  reservationId?: number | null;
 }
 
 export interface ExitRequest {

@@ -35,8 +35,9 @@ public class VehicleLogServiceImpl implements VehicleLogService {
 
     @Override
     public VehicleLogResponse logEntry(EntryRequest request, String authHeader) {
-        log.info("Entry request | vehicle={} slotId={} userId={}",
-                request.getVehicleNumber(), request.getSlotId(), request.getUserId());
+        log.info("Entry request | vehicle={} slotId={} reservationId={} userId={}",
+                request.getVehicleNumber(), request.getSlotId(),
+                request.getReservationId(), request.getUserId());
 
         // 1. Check for duplicate active session
         Optional<VehicleLog> existing = vehicleLogRepository
@@ -56,64 +57,95 @@ public class VehicleLogServiceImpl implements VehicleLogService {
         }
         log.debug("User validated | name={}", user.getName());
 
-        // 3. Check reservation-service for an active reservation for this vehicle
-
-        //    TWO PATHS:
-        //    PATH A — RESERVED VEHICLE
-        //    PATH B — WALK-IN VEHICLE
+        // 3. Determine PATH A (reserved) vs PATH B (walk-in)
+        //
+        //    PATH A — reservationId is present in the request → do a DIRECT single
+        //             reservation lookup. This bypasses getActiveReservations() and
+        //             is immune to circuit-breaker fallbacks returning empty lists.
+        //
+        //    PATH B — reservationId is absent → walk-in, slotId must be free (-1).
 
         Long resolvedSlotId       = null;
         Long matchedReservationId = null;
-        boolean isReservedVehicle = false;
+        boolean isReservedVehicle;
 
-        try {
-            List<ReservationResponse> activeReservations =
-                    reservationClient.getActiveReservations();
+        if (request.getReservationId() != null) {
+            // ── PATH A: RESERVED VEHICLE ──────────────────────────────────
+            //
+            // Strategy:
+            //   1. Try direct reservation lookup to confirm slotId and vehicle match.
+            //   2. If the reservation-service is down (fallback / circuit-breaker),
+            //      trust the slotId the frontend already sent — it was populated from
+            //      the same reservation record the staff selected.  This makes the
+            //      gate robust against a temporarily unavailable reservation-service.
+            //
+            log.info("Reserved entry | reservationId={} vehicle={}",
+                    request.getReservationId(), request.getVehicleNumber());
 
-            Optional<ReservationResponse> matched =
-                    findMatchingReservation(activeReservations, request.getVehicleNumber());
+            boolean reservationVerified = false;
 
-            if (matched.isPresent()) {
-                // ── PATH A: RESERVED VEHICLE ──────────────────────────────
-                ReservationResponse reservation = matched.get();
-                matchedReservationId = reservation.getId();
-                isReservedVehicle    = true;
+            try {
+                ReservationResponse reservation =
+                        reservationClient.getReservationById(request.getReservationId());
 
-                // Always use the slot from the reservation — ignore request body slotId
-                resolvedSlotId = reservation.getSlotId();
-
-                log.info("Reserved vehicle | reservationId={} slotId={} vehicle={}",
-                        matchedReservationId, resolvedSlotId, request.getVehicleNumber());
-
-            } else {
-                // ── PATH B: WALK-IN VEHICLE ───────────────────────────────
-                log.info("Walk-in vehicle | vehicle={}", request.getVehicleNumber());
-
-                // slotId is mandatory for walk-in — must be in request body
-                if (request.getSlotId() == null) {
-                    log.warn("SlotId missing for walk-in | vehicle={}",
-                            request.getVehicleNumber());
-                    throw new IllegalArgumentException(
-                            "slotId is required for walk-in entries. "
-                                    + "Please provide slotId in the request body.");
+                if (reservation.getId() != -1L) {
+                    // Reservation service is UP — validate vehicle ownership
+                    if (!request.getVehicleNumber().equals(reservation.getVehicleNumber())) {
+                        log.warn("Reservation vehicle mismatch | reservationId={} expected={} got={}",
+                                request.getReservationId(), reservation.getVehicleNumber(),
+                                request.getVehicleNumber());
+                        throw new IllegalArgumentException(
+                                "Reservation #" + request.getReservationId()
+                                        + " does not belong to vehicle "
+                                        + request.getVehicleNumber());
+                    }
+                    // Use the slot from the reservation record (authoritative)
+                    resolvedSlotId    = reservation.getSlotId();
+                    matchedReservationId = reservation.getId();
+                    reservationVerified  = true;
+                    log.info("Reservation verified | reservationId={} slotId={} vehicle={}",
+                            matchedReservationId, resolvedSlotId, request.getVehicleNumber());
+                } else {
+                    // Fallback — reservation-service is down
+                    log.warn("Reservation-service fallback (id=-1). "
+                            + "Trusting frontend slotId | reservationId={} slotId={}",
+                            request.getReservationId(), request.getSlotId());
                 }
-                resolvedSlotId = request.getSlotId();
+            } catch (IllegalArgumentException e) {
+                throw e;   // re-throw validation errors
+            } catch (Exception e) {
+                log.warn("Reservation-service error during lookup. "
+                        + "Trusting frontend slotId | reservationId={} error={}",
+                        request.getReservationId(), e.getMessage());
             }
 
-        } catch (IllegalArgumentException e) {
-            // Re-throw validation errors — do not swallow them
-            throw e;
-        } catch (Exception e) {
-            // Reservation-service is down — treat as walk-in
-            log.warn("Reservation-service unavailable. Treating as walk-in | vehicle={}",
-                    request.getVehicleNumber());
+            // If reservation-service was unavailable, fall back to slotId from request
+            if (!reservationVerified) {
+                if (request.getSlotId() == null) {
+                    throw new ServiceUnavailableException(
+                            "Reservation service is currently unavailable and no slotId was "
+                                    + "provided. Please try again.");
+                }
+                resolvedSlotId       = request.getSlotId();
+                matchedReservationId = request.getReservationId(); // trust what frontend sent
+            }
+
+            isReservedVehicle = true;
+
+        } else {
+            // ── PATH B: WALK-IN VEHICLE ───────────────────────────────────
+            log.info("Walk-in entry | vehicle={}", request.getVehicleNumber());
 
             if (request.getSlotId() == null) {
-                throw new ServiceUnavailableException(
-                        "Reservation service is unavailable. "
-                                + "Please provide slotId to proceed as walk-in.");
+                log.warn("SlotId missing for walk-in | vehicle={}", request.getVehicleNumber());
+                throw new IllegalArgumentException(
+                        "slotId is required for walk-in entries. "
+                                + "Please select an available slot.");
             }
-            resolvedSlotId = request.getSlotId();
+
+            resolvedSlotId       = request.getSlotId();
+            matchedReservationId = null;
+            isReservedVehicle    = false;
         }
 
         // 4. Validate slot via Feign
@@ -125,10 +157,12 @@ public class VehicleLogServiceImpl implements VehicleLogService {
                     "Slot service is currently unavailable. Please try again later.");
         }
 
-        // 5. Slot availability check — different logic for each path
+        // 5. Slot availability check — different rules per path
         if (isReservedVehicle) {
 
             // ── RESERVED VEHICLE SLOT CHECK ───────────────────────────────
+            // The slot is reserved FOR this vehicle. The only reason to block
+            // is if another vehicle is physically parked in it right now.
             boolean physicallyOccupied = vehicleLogRepository
                     .existsBySlotIdAndStatus(resolvedSlotId, LogStatus.ACTIVE);
 
@@ -137,7 +171,8 @@ public class VehicleLogServiceImpl implements VehicleLogService {
                         resolvedSlotId, matchedReservationId);
                 throw new SlotNotAvailableException(resolvedSlotId,
                         "Your reserved slot " + resolvedSlotId
-                                + " is currently physically occupied by another vehicle.");
+                                + " is currently physically occupied by another vehicle. "
+                                + "Please contact parking staff.");
             }
 
             log.debug("Reserved slot is physically free | slotId={}", resolvedSlotId);
@@ -145,19 +180,31 @@ public class VehicleLogServiceImpl implements VehicleLogService {
         } else {
 
             // ── WALK-IN VEHICLE SLOT CHECK ────────────────────────────────
-
+            // Walk-in vehicles may ONLY use slots that are fully available (-1).
+            // Slots status 0 (reserved) or 1 (occupied) are not allowed.
             int slotStatus = slot.getOccupiedStatus();
 
-            if (slotStatus == 1 || slotStatus == 0) {
-                log.warn("Walk-in denied | slot occupied or reserved | slotId={} status={}",
+            if (slotStatus != -1) {
+                log.warn("Walk-in denied | slot not available | slotId={} status={}",
                         resolvedSlotId, slotStatus);
+                String reason = slotStatus == 1 ? "occupied by another vehicle"
+                                                : "reserved for another vehicle";
                 throw new SlotNotAvailableException(resolvedSlotId,
-                        "Slot " + resolvedSlotId
-                                + " is not available. It is either occupied or reserved. "
-                                + "Please choose a different slot.");
+                        "Slot " + resolvedSlotId + " is " + reason
+                                + ". Please choose a different slot.");
             }
 
-            log.debug("Walk-in slot is free | slotId={} status={}", resolvedSlotId, slotStatus);
+            // Extra physical-occupancy safety net
+            boolean physicallyOccupied = vehicleLogRepository
+                    .existsBySlotIdAndStatus(resolvedSlotId, LogStatus.ACTIVE);
+            if (physicallyOccupied) {
+                log.warn("Walk-in denied | slot physically occupied | slotId={}", resolvedSlotId);
+                throw new SlotNotAvailableException(resolvedSlotId,
+                        "Slot " + resolvedSlotId
+                                + " is currently occupied. Please choose a different slot.");
+            }
+
+            log.debug("Walk-in slot accepted | slotId={}", resolvedSlotId);
         }
 
         // 6.//actual entry booking happens here
@@ -261,8 +308,36 @@ public class VehicleLogServiceImpl implements VehicleLogService {
                         vehicleLog.getReservationId(), e.getMessage());
             }
         } else {
-            log.info("Walk-in exit — no reservation to update | vehicle={}",
+            // Walk-in exit — reservationId was not stored during entry (e.g. reservation-service
+            // was unavailable at entry time). As a fallback, search for any CONFIRMED reservation
+            // matching this vehicle number and mark it COMPLETED now.
+            log.info("Walk-in exit — searching for matching CONFIRMED reservation | vehicle={}",
                     request.getVehicleNumber());
+            try {
+                List<ReservationResponse> active = reservationClient.getActiveReservations();
+                active.stream()
+                        .filter(r -> request.getVehicleNumber().equals(r.getVehicleNumber()))
+                        .findFirst()
+                        .ifPresent(reservation -> {
+                            ReservationUpdateRequest updateReq = new ReservationUpdateRequest();
+                            updateReq.setVehicleNumber(reservation.getVehicleNumber());
+                            updateReq.setStartTime(reservation.getStartTime());
+                            updateReq.setEndTime(exitTime);
+                            updateReq.setStatus("COMPLETED");
+                            ReservationResponse updated =
+                                    reservationClient.updateReservation(reservation.getId(), updateReq);
+                            if (updated.getId() != -1L) {
+                                log.info("Walk-in exit: matched and completed reservation id={} for vehicle={}",
+                                        reservation.getId(), request.getVehicleNumber());
+                            } else {
+                                log.warn("Walk-in exit: reservation-service fallback triggered for reservationId={}",
+                                        reservation.getId());
+                            }
+                        });
+            } catch (Exception e) {
+                log.warn("Walk-in exit: could not update reservation for vehicle={}. Reason: {}",
+                        request.getVehicleNumber(), e.getMessage());
+            }
         }
 
         // 5. Complete the vehicle log
@@ -315,20 +390,6 @@ public class VehicleLogServiceImpl implements VehicleLogService {
         log.info("Fetching logs | userId={}", userId);
         return vehicleLogRepository.findByUserId(userId)
                 .stream().map(this::toResponse).toList();
-    }
-
-    // ── HELPER ─────────────────────────────────────────────────────────────
-
-    /**
-     * Finds a CONFIRMED reservation matching the vehicle number.
-     * Returns Optional.empty() for walk-in vehicles.
-     */
-    private Optional<ReservationResponse> findMatchingReservation(
-            List<ReservationResponse> reservations,
-            String vehicleNumber) {
-        return reservations.stream()
-                .filter(r -> vehicleNumber.equals(r.getVehicleNumber()))
-                .findFirst();
     }
 
     // ── MAPPER ─────────────────────────────────────────────────────────────

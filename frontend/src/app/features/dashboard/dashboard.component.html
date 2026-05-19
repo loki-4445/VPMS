@@ -1,80 +1,80 @@
 <div class="animate-fade-in">
   <!-- Header -->
-  <div class="flex items-center justify-between mb-6">
+  <div class="page-header">
     <div>
-      <h1 class="text-xl font-bold text-slate-800">Dashboard</h1>
-      <p class="text-sm text-slate-500 mt-0.5">Welcome back, <span class="font-medium text-indigo-600">{{ auth.getEmail() }}</span></p>
+      <h1 class="page-title">Dashboard</h1>
+      <p class="page-subtitle">Welcome back, <strong>{{ auth.getEmail() }}</strong></p>
     </div>
-    <button (click)="loadData()"
-      class="flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 px-3 py-2 rounded-lg transition-all duration-200 border border-indigo-200">
+    <button (click)="loadData()" class="dash-refresh-btn">
       <i class="bi bi-arrow-clockwise"></i>
       Refresh
     </button>
   </div>
 
   @if (loading()) {
-    <div class="flex flex-col items-center justify-center py-20">
-      <svg class="animate-spin h-10 w-10 text-indigo-600 mb-3" fill="none" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+    <div class="spinner-container">
+      <svg class="animate-spin dash-spinner" fill="none" viewBox="0 0 24 24">
+        <circle class="spinner-track" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="spinner-fill" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
       </svg>
-      <p class="text-slate-400 text-sm">Loading dashboard...</p>
+      <p>Loading dashboard...</p>
     </div>
   } @else {
 
     <!-- Stat Cards -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <div class="card-tw p-5 animate-slide-up delay-75">
-        <div class="flex items-start justify-between">
-          <div>
-            <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Total Slots</p>
-            <p class="text-3xl font-bold text-slate-800 mt-1">{{ stats().totalSlots }}</p>
-            <p class="text-xs text-emerald-600 mt-1.5 font-medium">
-              <i class="bi bi-circle-fill mr-1" style="font-size:6px"></i>{{ stats().availableSlots }} available
+    <div class="stats-grid animate-slide-up">
+      <div class="card-tw stat-card delay-75">
+        <div class="stat-card-row">
+          <div class="stat-card-info">
+            <p class="stat-label">Total Slots</p>
+            <p class="stat-value">{{ stats().totalSlots }}</p>
+            <p class="stat-sub stat-sub--emerald">
+              <i class="bi bi-circle-fill" style="font-size:6px"></i>
+              {{ stats().availableSlots }} available
             </p>
           </div>
-          <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center">
-            <i class="bi bi-grid-3x3-gap-fill text-lg"></i>
+          <div class="stat-icon stat-icon--indigo">
+            <i class="bi bi-grid-3x3-gap-fill"></i>
           </div>
         </div>
       </div>
 
-      <div class="card-tw p-5 animate-slide-up delay-100">
-        <div class="flex items-start justify-between">
-          <div>
-            <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Active Reservations</p>
-            <p class="text-3xl font-bold text-slate-800 mt-1">{{ stats().activeReservations }}</p>
-            <p class="text-xs text-slate-400 mt-1.5">{{ stats().totalReservations }} total</p>
+      <div class="card-tw stat-card delay-100">
+        <div class="stat-card-row">
+          <div class="stat-card-info">
+            <p class="stat-label">Active Reservations</p>
+            <p class="stat-value">{{ stats().activeReservations }}</p>
+            <p class="stat-sub">{{ stats().totalReservations }} total</p>
           </div>
-          <div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center">
-            <i class="bi bi-calendar-check-fill text-lg"></i>
+          <div class="stat-icon stat-icon--emerald">
+            <i class="bi bi-calendar-check-fill"></i>
           </div>
         </div>
       </div>
 
-      <div class="card-tw p-5 animate-slide-up delay-150">
-        <div class="flex items-start justify-between">
-          <div>
-            <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Currently Parked</p>
-            <p class="text-3xl font-bold text-slate-800 mt-1">{{ stats().activeLogs }}</p>
-            <p class="text-xs text-slate-400 mt-1.5">{{ stats().occupiedSlots }} slots occupied</p>
+      <div class="card-tw stat-card delay-150">
+        <div class="stat-card-row">
+          <div class="stat-card-info">
+            <p class="stat-label">Currently Parked</p>
+            <p class="stat-value">{{ stats().activeLogs }}</p>
+            <p class="stat-sub">{{ stats().occupiedSlots }} slots occupied</p>
           </div>
-          <div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center">
-            <i class="bi bi-car-front-fill text-lg"></i>
+          <div class="stat-icon stat-icon--amber">
+            <i class="bi bi-car-front-fill"></i>
           </div>
         </div>
       </div>
 
       @if (auth.hasRole('ADMIN', 'STAFF')) {
-        <div class="card-tw p-5 animate-slide-up delay-200">
-          <div class="flex items-start justify-between">
-            <div>
-              <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Pending Invoices</p>
-              <p class="text-3xl font-bold text-slate-800 mt-1">{{ stats().pendingInvoices }}</p>
-              <p class="text-xs text-slate-400 mt-1.5">{{ stats().totalInvoices }} total</p>
+        <div class="card-tw stat-card delay-200">
+          <div class="stat-card-row">
+            <div class="stat-card-info">
+              <p class="stat-label">Pending Invoices</p>
+              <p class="stat-value">{{ stats().pendingInvoices }}</p>
+              <p class="stat-sub">{{ stats().totalInvoices }} total</p>
             </div>
-            <div class="w-10 h-10 bg-red-100 text-red-600 rounded-xl flex items-center justify-center">
-              <i class="bi bi-receipt-cutoff text-lg"></i>
+            <div class="stat-icon stat-icon--red">
+              <i class="bi bi-receipt-cutoff"></i>
             </div>
           </div>
         </div>
@@ -83,27 +83,27 @@
 
     <!-- Occupancy Bar -->
     @if (stats().totalSlots > 0) {
-      <div class="card-tw p-5 mb-6 animate-slide-up delay-200">
-        <h2 class="text-sm font-semibold text-slate-700 mb-3">Slot Occupancy Overview</h2>
-        <div class="w-full h-4 rounded-full bg-slate-100 overflow-hidden flex">
-          <div class="h-full bg-emerald-500 transition-all duration-700"
+      <div class="card-tw occupancy-card animate-slide-up delay-200">
+        <h2 class="occupancy-title">Slot Occupancy Overview</h2>
+        <div class="occupancy-bar">
+          <div class="occupancy-segment seg-available"
             [style.width.%]="(stats().availableSlots / stats().totalSlots) * 100"></div>
-          <div class="h-full bg-amber-400 transition-all duration-700"
+          <div class="occupancy-segment seg-reserved"
             [style.width.%]="(stats().reservedSlots / stats().totalSlots) * 100"></div>
-          <div class="h-full bg-red-500 transition-all duration-700"
+          <div class="occupancy-segment seg-occupied"
             [style.width.%]="(stats().occupiedSlots / stats().totalSlots) * 100"></div>
         </div>
-        <div class="flex gap-5 mt-2.5">
-          <span class="flex items-center gap-1.5 text-xs text-slate-600">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+        <div class="occupancy-legend">
+          <span class="legend-item">
+            <span class="legend-dot dot-available"></span>
             {{ stats().availableSlots }} Available
           </span>
-          <span class="flex items-center gap-1.5 text-xs text-slate-600">
-            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+          <span class="legend-item">
+            <span class="legend-dot dot-reserved"></span>
             {{ stats().reservedSlots }} Reserved
           </span>
-          <span class="flex items-center gap-1.5 text-xs text-slate-600">
-            <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+          <span class="legend-item">
+            <span class="legend-dot dot-occupied"></span>
             {{ stats().occupiedSlots }} Occupied
           </span>
         </div>
@@ -111,36 +111,38 @@
     }
 
     <!-- Tables Row -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div class="dash-tables-grid">
       <!-- Recent Reservations -->
       <div class="card-tw animate-slide-up delay-300">
-        <div class="flex items-center justify-between px-5 pt-4 pb-3 border-b border-slate-100">
-          <h2 class="text-sm font-semibold text-slate-700">Recent Reservations</h2>
-          <a routerLink="/reservations" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors">View All →</a>
+        <div class="dash-table-header">
+          <h2 class="dash-table-title">Recent Reservations</h2>
+          <a routerLink="/reservations" class="dash-view-all">View All →</a>
         </div>
         @if (recentReservations().length === 0) {
-          <div class="py-10 text-center text-slate-400 text-sm">
-            <i class="bi bi-calendar-x text-2xl block mb-2"></i>No reservations yet
+          <div class="empty-state">
+            <i class="bi bi-calendar-x empty-state-icon"></i>
+            <p class="empty-state-title">No reservations yet</p>
           </div>
         } @else {
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
+          <div class="table-scroll">
+            <table class="data-table">
               <thead>
-                <tr class="text-xs uppercase text-slate-400 border-b border-slate-100">
-                  <th class="text-left px-5 py-2.5 font-semibold">ID</th>
-                  <th class="text-left px-5 py-2.5 font-semibold">Vehicle</th>
-                  <th class="text-left px-5 py-2.5 font-semibold">Slot</th>
-                  <th class="text-left px-5 py-2.5 font-semibold">Status</th>
+                <tr>
+                  <th>ID</th>
+                  <th>Vehicle</th>
+                  <th>Slot</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               <tbody>
                 @for (r of recentReservations(); track r.id) {
-                  <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-                    <td class="px-5 py-3 text-slate-400 text-xs">#{{ r.id }}</td>
-                    <td class="px-5 py-3 font-semibold text-slate-700">{{ r.vehicleNumber }}</td>
-                    <td class="px-5 py-3 text-slate-500 text-xs">{{ r.slotLocation }}-{{ r.slotId }}</td>
-                    <td class="px-5 py-3">
-                      @if (r.status === 'ACTIVE') { <span class="badge-active">Active</span> }
+                  <tr>
+                    <td class="td-id">{{ r.id }}</td>
+                    <td class="td-primary">{{ r.vehicleNumber }}</td>
+                    <td class="td-secondary">{{ r.slotLocation }}-{{ r.slotId }}</td>
+                    <td>
+                      @if (r.status === 'CONFIRMED') { <span class="badge-confirmed">Confirmed</span> }
+                      @else if (r.status === 'COMPLETED') { <span class="badge-completed">Completed</span> }
                       @else if (r.status === 'CANCELLED') { <span class="badge-cancelled">Cancelled</span> }
                       @else { <span class="badge-inactive">{{ r.status }}</span> }
                     </td>
@@ -155,32 +157,33 @@
       <!-- Active Vehicle Logs (Admin/Staff only) -->
       @if (auth.hasRole('ADMIN', 'STAFF')) {
         <div class="card-tw animate-slide-up delay-400">
-          <div class="flex items-center justify-between px-5 pt-4 pb-3 border-b border-slate-100">
-            <h2 class="text-sm font-semibold text-slate-700">Currently Parked Vehicles</h2>
-            <a routerLink="/vehicle-logs" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors">View All →</a>
+          <div class="dash-table-header">
+            <h2 class="dash-table-title">Currently Parked Vehicles</h2>
+            <a routerLink="/vehicle-logs" class="dash-view-all">View All →</a>
           </div>
           @if (activeLogs().length === 0) {
-            <div class="py-10 text-center text-slate-400 text-sm">
-              <i class="bi bi-car-front text-2xl block mb-2"></i>No vehicles currently parked
+            <div class="empty-state">
+              <i class="bi bi-car-front empty-state-icon"></i>
+              <p class="empty-state-title">No vehicles currently parked</p>
             </div>
           } @else {
-            <div class="overflow-x-auto">
-              <table class="w-full text-sm">
+            <div class="table-scroll">
+              <table class="data-table">
                 <thead>
-                  <tr class="text-xs uppercase text-slate-400 border-b border-slate-100">
-                    <th class="text-left px-5 py-2.5 font-semibold">Vehicle</th>
-                    <th class="text-left px-5 py-2.5 font-semibold">Slot</th>
-                    <th class="text-left px-5 py-2.5 font-semibold">Entry Time</th>
-                    <th class="text-left px-5 py-2.5 font-semibold">Status</th>
+                  <tr>
+                    <th>Vehicle</th>
+                    <th>Slot</th>
+                    <th>Entry Time</th>
+                    <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   @for (log of activeLogs(); track log.logId) {
-                    <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-                      <td class="px-5 py-3 font-semibold text-slate-700">{{ log.vehicleNumber }}</td>
-                      <td class="px-5 py-3 text-slate-500 text-xs">{{ log.slotId }}</td>
-                      <td class="px-5 py-3 text-slate-500 text-xs">{{ log.entryTime | date:'shortTime' }}</td>
-                      <td class="px-5 py-3"><span class="badge-active">Active</span></td>
+                    <tr>
+                      <td class="td-primary">{{ log.vehicleNumber }}</td>
+                      <td class="td-secondary">{{ log.slotId }}</td>
+                      <td class="td-secondary">{{ log.entryTime | date:'shortTime' }}</td>
+                      <td><span class="badge-active">Active</span></td>
                     </tr>
                   }
                 </tbody>

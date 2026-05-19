@@ -1,21 +1,20 @@
 <div class="animate-fade-in">
   <!-- Header -->
-  <div class="flex items-center justify-between mb-6">
+  <div class="page-header">
     <div>
-      <h1 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-        <i class="bi bi-car-front-fill text-indigo-600"></i> Vehicle Logs
+      <h1 class="page-title">
+        <i class="bi bi-car-front-fill" style="color:#4f46e5"></i> Vehicle Logs
       </h1>
-      <p class="text-sm text-slate-500 mt-0.5">
-        <span class="text-emerald-600 font-medium">{{ activeCount }}</span> active ·
-        <span class="text-slate-400">{{ completedCount }} completed</span>
+      <p class="page-subtitle">
+        <span class="count-active">{{ activeCount }}</span> active ·
+        <span class="count-completed">{{ completedCount }} completed</span>
       </p>
     </div>
-    <div class="flex gap-2">
-      <button (click)="openEntryModal()" class="btn-primary-tw flex items-center gap-1.5">
+    <div class="vl-header-btns">
+      <button (click)="openEntryModal()" class="btn-primary-tw">
         <i class="bi bi-box-arrow-in-right"></i> Log Entry
       </button>
-      <button (click)="openExitModal()"
-        class="flex items-center gap-1.5 bg-amber-500 hover:bg-amber-600 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-200 text-sm">
+      <button (click)="openExitModal()" class="btn-amber">
         <i class="bi bi-box-arrow-right"></i> Log Exit
       </button>
     </div>
@@ -23,81 +22,76 @@
 
   <!-- Alerts -->
   @if (success()) {
-    <div class="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg px-4 py-3 mb-4 text-sm animate-fade-in">
-      <i class="bi bi-check-circle-fill text-emerald-500"></i> {{ success() }}
-      <button (click)="success.set('')" class="ml-auto"><i class="bi bi-x-lg"></i></button>
+    <div class="alert alert-success animate-fade-in">
+      <i class="bi bi-check-circle-fill"></i> {{ success() }}
+      <button (click)="success.set('')" class="alert-close"><i class="bi bi-x-lg"></i></button>
     </div>
   }
   @if (error()) {
-    <div class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 rounded-lg px-4 py-3 mb-4 text-sm animate-fade-in">
-      <i class="bi bi-exclamation-circle-fill text-red-500"></i> {{ error() }}
-      <button (click)="error.set('')" class="ml-auto"><i class="bi bi-x-lg"></i></button>
+    <div class="alert alert-error animate-fade-in">
+      <i class="bi bi-exclamation-circle-fill"></i> {{ error() }}
+      <button (click)="error.set('')" class="alert-close"><i class="bi bi-x-lg"></i></button>
     </div>
   }
 
   <!-- Filters -->
-  <div class="card-tw p-3 mb-4">
-    <div class="flex flex-wrap gap-2 items-center">
-      <div class="relative flex-1 min-w-48">
-        <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-        <input class="input-tw text-sm" style="padding-left:2.75rem" placeholder="Search vehicle number…" [(ngModel)]="searchVehicle" />
+  <div class="filter-bar">
+    <div class="filter-row">
+      <div class="search-field">
+        <i class="bi bi-search search-field-icon"></i>
+        <input class="input-tw" placeholder="Search vehicle number…" [(ngModel)]="searchVehicle" />
       </div>
-      <select class="input-tw w-36 text-sm" [(ngModel)]="filterStatus">
+      <select class="input-tw vl-filter-sel" [(ngModel)]="filterStatus">
         <option value="">ALL STATUSES</option>
         <option value="ACTIVE">ACTIVE</option>
         <option value="COMPLETED">COMPLETED</option>
       </select>
-      <button (click)="filterStatus=''; searchVehicle=''"
-        class="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 px-3 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition-all">
+      <button (click)="filterStatus=''; searchVehicle=''" class="clear-btn">
         <i class="bi bi-x-circle"></i> Clear
       </button>
     </div>
   </div>
 
   <!-- Table -->
-  <div class="card-tw overflow-hidden">
+  <div class="table-card">
     @if (loading()) {
-      <div class="flex justify-center items-center py-16">
-        <svg class="animate-spin h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+      <div class="spinner-container">
+        <svg class="animate-spin vl-spinner" fill="none" viewBox="0 0 24 24">
+          <circle class="spinner-track" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="spinner-fill" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
         </svg>
       </div>
     } @else if (filtered.length === 0) {
-      <div class="text-center py-16 text-slate-400">
-        <i class="bi bi-car-front text-4xl block mb-2"></i>
-        <p class="text-sm">No vehicle logs found</p>
+      <div class="empty-state">
+        <i class="bi bi-car-front empty-state-icon"></i>
+        <p class="empty-state-title">No vehicle logs found</p>
       </div>
     } @else {
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm">
+      <div class="table-scroll">
+        <table class="data-table">
           <thead>
-            <tr class="text-xs uppercase text-slate-400 bg-slate-50 border-b border-slate-100">
-              <th class="text-left px-5 py-3 font-semibold">Log ID</th>
-              <th class="text-left px-5 py-3 font-semibold">Vehicle</th>
-              <th class="text-left px-5 py-3 font-semibold">Slot</th>
-              <th class="text-left px-5 py-3 font-semibold">Entry Time</th>
-              <th class="text-left px-5 py-3 font-semibold">Exit Time</th>
-              <th class="text-left px-5 py-3 font-semibold">Duration</th>
-              <th class="text-left px-5 py-3 font-semibold">Status</th>
+            <tr>
+              <th>Log ID</th>
+              <th>Vehicle</th>
+              <th>Slot</th>
+              <th>Entry Time</th>
+              <th>Exit Time</th>
+              <th>Duration</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
             @for (log of filtered; track log.logId) {
-              <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-                <td class="px-5 py-3 text-slate-400 text-xs">#{{ log.logId }}</td>
-                <td class="px-5 py-3 font-semibold text-slate-700">{{ log.vehicleNumber }}</td>
-                <td class="px-5 py-3">
-                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-600">
-                    #{{ log.slotId }}
-                  </span>
-                </td>
-                <td class="px-5 py-3 text-xs text-slate-500">{{ log.entryTime | date:'dd MMM, HH:mm' }}</td>
-                <td class="px-5 py-3 text-xs text-slate-500">{{ log.exitTime ? (log.exitTime | date:'dd MMM, HH:mm') : '—' }}</td>
-                <td class="px-5 py-3 text-xs text-slate-500">{{ formatDuration(log.durationMinutes) }}</td>
-                <td class="px-5 py-3">
+              <tr>
+                <td class="td-id">{{ log.logId }}</td>
+                <td class="td-primary">{{ log.vehicleNumber }}</td>
+                <td><span class="slot-chip">{{ log.slotId }}</span></td>
+                <td class="td-secondary">{{ log.entryTime | date:'dd MMM, HH:mm' }}</td>
+                <td class="td-secondary">{{ log.exitTime ? (log.exitTime | date:'dd MMM, HH:mm') : '—' }}</td>
+                <td class="td-secondary">{{ formatDuration(log.durationMinutes) }}</td>
+                <td>
                   @if (log.status === 'ACTIVE') { <span class="badge-active">Active</span> }
-                  @else { <span class="badge-inactive">Completed</span> }
+                  @else { <span class="badge-completed">Completed</span> }
                 </td>
               </tr>
             }
@@ -110,103 +104,123 @@
 
 <!-- Entry Modal -->
 @if (showEntryModal()) {
-  <div class="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm animate-fade-in" (click)="showEntryModal.set(false)"></div>
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm animate-scale-in">
-      <div class="flex items-center justify-between px-6 pt-5 pb-4 border-b border-slate-100">
-        <h3 class="font-bold text-slate-800 flex items-center gap-2">
-          <i class="bi bi-box-arrow-in-right text-indigo-600"></i> Log Vehicle Entry
-        </h3>
-        <button (click)="showEntryModal.set(false)" class="text-slate-400 hover:text-slate-600">
-          <i class="bi bi-x-lg"></i>
-        </button>
+  <div class="modal-overlay" (click)="showEntryModal.set(false)"></div>
+  <div class="modal-wrapper">
+    <div class="modal-box modal-box--sm animate-scale-in">
+      <div class="modal-header">
+        <h3><i class="bi bi-box-arrow-in-right" style="color:#4f46e5"></i> Log Vehicle Entry</h3>
+        <button (click)="showEntryModal.set(false)" class="modal-close-btn"><i class="bi bi-x-lg"></i></button>
       </div>
-      <div class="p-6 space-y-4">
+      <div class="modal-body">
         @if (error()) {
-          <div class="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{{ error() }}</div>
+          <div class="form-error-box">{{ error() }}</div>
         }
-        <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1">Select Reserved Vehicle <span class="text-red-500">*</span></label>
-          @if (activeReservations().length > 0) {
-            <div class="relative w-full">
-              <!-- Autocomplete input -->
-              <div class="relative w-full">
-                <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
-                <input class="input-tw text-sm w-full" style="padding-left:2.75rem;padding-right:2.25rem" placeholder="Type vehicle number…"
-                  [(ngModel)]="entrySearch" autocomplete="off"
-                  (input)="showEntryDropdown = true"
-                  (focus)="showEntryDropdown = true"
-                  (blur)="closeEntryDropdown()" />
-                @if (entrySearch) {
-                  <button type="button" (click)="clearEntrySearch()"
-                    class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500 transition-colors">
-                    <i class="bi bi-x-circle-fill text-sm"></i>
-                  </button>
-                }
-              </div>
-              <!-- Suggestions dropdown -->
-              @if (showEntryDropdown && entrySearch) {
-                <div class="absolute z-30 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-52 overflow-y-auto">
-                  @if (filteredReservations.length > 0) {
-                    @for (res of filteredReservations; track res.id) {
-                      <button type="button" (mousedown)="selectReservationFromDropdown(res)"
-                        class="w-full text-left px-4 py-2.5 hover:bg-indigo-50 transition-colors border-b border-slate-50 last:border-0 flex items-center justify-between gap-2">
-                        <span class="font-semibold text-slate-800 text-sm">{{ res.vehicleNumber }}</span>
-                        <span class="text-xs text-slate-400 shrink-0">Slot #{{ res.slotId }} · {{ res.slotType }} · {{ res.userName }}</span>
-                      </button>
-                    }
-                  } @else {
-                    <div class="px-4 py-3 text-sm text-slate-400 text-center">No matching reservations</div>
+
+        <!-- Mode tabs -->
+        <div class="entry-mode-tabs">
+          <button type="button" class="entry-mode-tab"
+            [class.active]="entryMode === 'reserved'"
+            (click)="switchEntryMode('reserved')">
+            <i class="bi bi-bookmark-check-fill"></i> Reserved Vehicle
+          </button>
+          <button type="button" class="entry-mode-tab"
+            [class.active]="entryMode === 'walkin'"
+            (click)="switchEntryMode('walkin')">
+            <i class="bi bi-person-walking"></i> Walk-in Vehicle
+          </button>
+        </div>
+
+        <!-- ── RESERVED MODE ── -->
+        @if (entryMode === 'reserved') {
+          <div>
+            <label class="form-label">Search Reserved Vehicle <span class="required">*</span></label>
+            @if (activeReservations().length > 0) {
+              <div class="vl-search-wrap">
+                <div class="search-field">
+                  <i class="bi bi-search search-field-icon" style="font-size:0.75rem"></i>
+                  <input class="input-tw" style="padding-left:2.75rem;padding-right:2.25rem"
+                    placeholder="Type vehicle number or name…"
+                    [(ngModel)]="entrySearch" autocomplete="off"
+                    (input)="showEntryDropdown = true"
+                    (focus)="showEntryDropdown = true"
+                    (blur)="closeEntryDropdown()" />
+                  @if (entrySearch) {
+                    <button type="button" (click)="clearEntrySearch()" class="search-clear">
+                      <i class="bi bi-x-circle-fill"></i>
+                    </button>
                   }
                 </div>
+                @if (showEntryDropdown && entrySearch) {
+                  <div class="suggestion-dropdown">
+                    @if (filteredReservations.length > 0) {
+                      @for (res of filteredReservations; track res.id) {
+                        <button type="button" (mousedown)="selectReservationFromDropdown(res)"
+                          class="suggestion-item">
+                          <span class="vehicle-num">{{ res.vehicleNumber }}</span>
+                          <span class="vehicle-detail">Slot #{{ res.slotId }} · {{ res.slotType }} · {{ res.userName }}</span>
+                        </button>
+                      }
+                    } @else {
+                      <div class="suggestion-empty">No matching reservations found</div>
+                    }
+                  </div>
+                }
+              </div>
+              @if (reservationSelected && reservedVehicleNumber && reservedSlotId) {
+                <div class="selection-chip">
+                  <i class="bi bi-check-circle-fill" style="color:#059669"></i>
+                  <span><strong>{{ reservedVehicleNumber }}</strong> → Slot #{{ reservedSlotId }} selected</span>
+                </div>
+                <div class="slot-preassigned" style="margin-top:0.5rem">
+                  <i class="bi bi-geo-alt-fill" style="color:#4f46e5"></i>
+                  Slot #{{ reservedSlotId }}
+                  <span class="slot-label">Pre-assigned from reservation</span>
+                </div>
               }
-            </div>
-            <!-- Selected confirmation chip -->
-            @if (entryForm.vehicleNumber && entryForm.slotId) {
-              <div class="mt-2 flex items-center gap-2 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
-                <i class="bi bi-check-circle-fill text-emerald-500"></i>
-                <span><strong>{{ entryForm.vehicleNumber }}</strong> → Slot #{{ entryForm.slotId }} selected</span>
+            } @else {
+              <div class="info-note">
+                <i class="bi bi-info-circle"></i>
+                No active reservations found. Use <strong>Walk-in</strong> tab to log entry.
               </div>
             }
-          } @else {
-            <div class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-2">
-              <i class="bi bi-info-circle mr-1"></i>No active reservations. Enter vehicle number manually.
-            </div>
-            <input class="input-tw uppercase" [(ngModel)]="entryForm.vehicleNumber"
-              placeholder="e.g. TN01AB1234" maxlength="10"
-              (input)="entryForm.vehicleNumber = entryForm.vehicleNumber.toUpperCase()" />
-          }
-        </div>
-        @if (reservationSelected) {
-          <!-- Slot pre-assigned from reservation — read-only -->
-          <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1">Assigned Slot</label>
-            <div class="flex items-center gap-2 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700">
-              <i class="bi bi-geo-alt-fill text-indigo-500"></i>
-              Slot #{{ entryForm.slotId }}
-              <span class="ml-auto text-xs text-slate-400">Pre-assigned from reservation</span>
-            </div>
-          </div>
-        } @else {
-          <!-- Walk-in: no reservation selected, let user pick a slot -->
-          <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1">Assign Slot <span class="text-red-500">*</span></label>
-            <select class="input-tw" [(ngModel)]="entryForm.slotId">
-              <option [value]="0" disabled>Select available slot</option>
-              @for (slot of availableSlots(); track slot.id) {
-                <option [value]="slot.id">{{ slot.location }}-{{ slot.id }} ({{ slot.type }})</option>
-              }
-            </select>
           </div>
         }
+
+        <!-- ── WALK-IN MODE ── -->
+        @if (entryMode === 'walkin') {
+          <div>
+            <label class="form-label">Vehicle Number <span class="required">*</span></label>
+            <input class="input-tw" style="text-transform:uppercase"
+              [(ngModel)]="walkinVehicleNumber"
+              placeholder="e.g. TN01AB1234" maxlength="10"
+              (input)="walkinVehicleNumber = walkinVehicleNumber.toUpperCase()" />
+          </div>
+          <div>
+            <label class="form-label">Select Available Slot <span class="required">*</span></label>
+            @if (availableSlots().length > 0) {
+              <select class="input-tw" [(ngModel)]="walkinSlotId">
+                <option [value]="0" disabled>Select a free slot</option>
+                @for (slot of availableSlots(); track slot.id) {
+                  <option [value]="slot.id">{{ slot.location }}-{{ slot.id }} ({{ slot.type }})</option>
+                }
+              </select>
+            } @else {
+              <div class="info-note" style="color:#dc2626;background:#fef2f2;border-color:#fecaca">
+                <i class="bi bi-exclamation-circle"></i>
+                No available slots right now. All slots are occupied or reserved.
+              </div>
+            }
+          </div>
+        }
+
       </div>
-      <div class="flex justify-end gap-2 px-6 pb-5">
+      <div class="modal-footer">
         <button (click)="showEntryModal.set(false)" class="btn-secondary-tw">Cancel</button>
-        <button (click)="logEntry()" [disabled]="saving()" class="btn-primary-tw flex items-center gap-1.5">
+        <button (click)="logEntry()" [disabled]="saving()" class="btn-primary-tw">
           @if (saving()) {
-            <svg class="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+            <svg class="animate-spin btn-spinner" fill="none" viewBox="0 0 24 24">
+              <circle class="spinner-track" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="spinner-fill" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
             </svg>
           }
           Log Entry
@@ -218,85 +232,77 @@
 
 <!-- Exit Modal -->
 @if (showExitModal()) {
-  <div class="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm animate-fade-in" (click)="showExitModal.set(false)"></div>
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm animate-scale-in">
-      <div class="flex items-center justify-between px-6 pt-5 pb-4 border-b border-slate-100">
-        <h3 class="font-bold text-slate-800 flex items-center gap-2">
-          <i class="bi bi-box-arrow-right text-amber-500"></i> Log Vehicle Exit
-        </h3>
-        <button (click)="showExitModal.set(false)" class="text-slate-400 hover:text-slate-600">
-          <i class="bi bi-x-lg"></i>
-        </button>
+  <div class="modal-overlay" (click)="showExitModal.set(false)"></div>
+  <div class="modal-wrapper">
+    <div class="modal-box modal-box--sm animate-scale-in">
+      <div class="modal-header">
+        <h3><i class="bi bi-box-arrow-right" style="color:#f59e0b"></i> Log Vehicle Exit</h3>
+        <button (click)="showExitModal.set(false)" class="modal-close-btn"><i class="bi bi-x-lg"></i></button>
       </div>
-      <div class="p-6 space-y-4">
+      <div class="modal-body">
         @if (error()) {
-          <div class="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{{ error() }}</div>
+          <div class="form-error-box">{{ error() }}</div>
         }
         <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1">Select Vehicle to Exit <span class="text-red-500">*</span></label>
+          <label class="form-label">Select Vehicle to Exit <span class="required">*</span></label>
           @if (activeVehicleLogs.length > 0) {
-            <div class="relative w-full">
-              <!-- Autocomplete input -->
-              <div class="relative w-full">
-                <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
-                <input class="input-tw text-sm w-full" style="padding-left:2.75rem;padding-right:2.25rem" placeholder="Type vehicle number…"
+            <div class="vl-search-wrap">
+              <div class="search-field">
+                <i class="bi bi-search search-field-icon" style="font-size:0.75rem"></i>
+                <input class="input-tw" style="padding-left:2.75rem;padding-right:2.25rem"
+                  placeholder="Type vehicle number…"
                   [(ngModel)]="exitSearch" autocomplete="off"
                   (input)="showExitDropdown = true; exitVehicleNumber = ''"
                   (focus)="showExitDropdown = true"
                   (blur)="closeExitDropdown()" />
                 @if (exitSearch) {
-                  <button type="button" (click)="clearExitSearch()"
-                    class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500 transition-colors">
-                    <i class="bi bi-x-circle-fill text-sm"></i>
+                  <button type="button" (click)="clearExitSearch()" class="search-clear">
+                    <i class="bi bi-x-circle-fill"></i>
                   </button>
                 }
               </div>
-              <!-- Suggestions dropdown -->
               @if (showExitDropdown && exitSearch) {
-                <div class="absolute z-30 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-52 overflow-y-auto">
+                <div class="suggestion-dropdown">
                   @if (filteredActiveLogs.length > 0) {
                     @for (log of filteredActiveLogs; track log.logId) {
                       <button type="button" (mousedown)="selectExitFromDropdown(log)"
-                        class="w-full text-left px-4 py-2.5 hover:bg-amber-50 transition-colors border-b border-slate-50 last:border-0 flex items-center justify-between gap-2">
-                        <span class="font-semibold text-slate-800 text-sm">{{ log.vehicleNumber }}</span>
-                        <span class="text-xs text-slate-400 shrink-0">Slot #{{ log.slotId }} · since {{ log.entryTime | date:'dd MMM, HH:mm' }}</span>
+                        class="suggestion-item suggestion-item--amber">
+                        <span class="vehicle-num">{{ log.vehicleNumber }}</span>
+                        <span class="vehicle-detail">Slot #{{ log.slotId }} · since {{ log.entryTime | date:'dd MMM, HH:mm' }}</span>
                       </button>
                     }
                   } @else {
-                    <div class="px-4 py-3 text-sm text-slate-400 text-center">No matching vehicles inside</div>
+                    <div class="suggestion-empty">No matching vehicles inside</div>
                   }
                 </div>
               }
             </div>
-            <!-- Selected confirmation chip -->
             @if (exitVehicleNumber) {
-              <div class="mt-2 flex items-center gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-                <i class="bi bi-check-circle-fill text-amber-500"></i>
+              <div class="selection-chip selection-chip--amber">
+                <i class="bi bi-check-circle-fill" style="color:#f59e0b"></i>
                 <span><strong>{{ exitVehicleNumber }}</strong> selected for exit</span>
               </div>
             }
           } @else {
-            <div class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-2">
-              <i class="bi bi-info-circle mr-1"></i>No active vehicles inside. Enter vehicle number manually.
+            <div class="info-note" style="margin-bottom:0.5rem">
+              <i class="bi bi-info-circle"></i>No active vehicles inside. Enter vehicle number manually.
             </div>
-            <input class="input-tw uppercase" [(ngModel)]="exitVehicleNumber"
+            <input class="input-tw" style="text-transform:uppercase" [(ngModel)]="exitVehicleNumber"
               placeholder="e.g. TN01AB1234" maxlength="10"
               (input)="exitVehicleNumber = exitVehicleNumber.toUpperCase()" />
           }
         </div>
-        <p class="text-xs text-slate-500 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-          <i class="bi bi-info-circle mr-1"></i>An invoice will be generated automatically after exit.
+        <p class="info-note">
+          <i class="bi bi-info-circle"></i>An invoice will be generated automatically after exit.
         </p>
       </div>
-      <div class="flex justify-end gap-2 px-6 pb-5">
+      <div class="modal-footer">
         <button (click)="showExitModal.set(false)" class="btn-secondary-tw">Cancel</button>
-        <button (click)="logExit()" [disabled]="saving()"
-          class="flex items-center gap-1.5 bg-amber-500 hover:bg-amber-600 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-200 disabled:opacity-60 text-sm">
+        <button (click)="logExit()" [disabled]="saving()" class="btn-amber">
           @if (saving()) {
-            <svg class="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+            <svg class="animate-spin btn-spinner" fill="none" viewBox="0 0 24 24">
+              <circle class="spinner-track" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="spinner-fill" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
             </svg>
           }
           Log Exit
@@ -308,15 +314,15 @@
 
 <!-- Invoice Modal (auto after exit) -->
 @if (showInvoiceModal()) {
-  <div class="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm animate-fade-in"></div>
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-scale-in">
+  <div class="modal-overlay"></div>
+  <div class="modal-wrapper">
+    <div class="modal-box animate-scale-in">
 
       <!-- Header -->
-      <div class="flex items-center justify-between px-6 pt-5 pb-4 border-b border-slate-100">
-        <div class="flex items-center gap-2">
-          <i class="bi bi-receipt-cutoff text-indigo-600 text-lg"></i>
-          <h3 class="font-bold text-slate-800">
+      <div class="modal-header">
+        <div class="modal-header-inner">
+          <i class="bi bi-receipt-cutoff" style="color:#4f46e5;font-size:1.125rem"></i>
+          <h3>
             @if (!awaitingConfirmation() && !paymentDone()) { Invoice &amp; Payment }
             @else if (awaitingConfirmation() && paymentMethod === 'CASH') { Collect Cash }
             @else if (awaitingConfirmation() && paymentMethod === 'UPI') { UPI Payment }
@@ -324,201 +330,174 @@
           </h3>
         </div>
         @if (!awaitingConfirmation() && !paymentDone()) {
-          <button (click)="closeInvoiceModal()" class="text-slate-400 hover:text-slate-600" title="Close — invoice will remain pending in Invoices tab">
+          <button (click)="closeInvoiceModal()" class="modal-close-btn" title="Close — invoice will remain pending in Invoices tab">
             <i class="bi bi-x-lg"></i>
           </button>
         }
       </div>
 
-      <div class="p-6">
+      <div class="modal-body">
 
-        <!-- ── STEP 1: Method selection ──────────────────────────── -->
+        <!-- STEP 1: Method selection -->
         @if (!awaitingConfirmation() && !paymentDone()) {
-          <div class="space-y-4">
-            <!-- Vehicle summary -->
-            @if (exitedLog()) {
-              <div class="bg-slate-50 rounded-xl p-4 space-y-2 text-sm">
-                <div class="flex justify-between">
-                  <span class="text-slate-500">Vehicle</span>
-                  <span class="font-semibold text-slate-800">{{ exitedLog()!.vehicleNumber }}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-slate-500">Slot</span>
-                  <span class="font-semibold text-slate-800">#{{ exitedLog()!.slotId }}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-slate-500">Duration</span>
-                  <span class="font-semibold text-slate-800">{{ formatDuration(exitedLog()!.durationMinutes) }}</span>
-                </div>
+          @if (exitedLog()) {
+            <div class="summary-box">
+              <div class="summary-row">
+                <span class="s-label">Vehicle</span>
+                <span class="s-value">{{ exitedLog()!.vehicleNumber }}</span>
               </div>
-            }
-            <!-- Payment method -->
-            <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-2">Select Payment Method</label>
-              <div class="grid grid-cols-2 gap-3">
-                <button type="button" (click)="paymentMethod = 'UPI'"
-                  class="flex flex-col items-center gap-1 py-3 rounded-xl text-sm font-semibold border-2 transition-all duration-200"
-                  [class.border-indigo-500]="paymentMethod === 'UPI'"
-                  [class.bg-indigo-50]="paymentMethod === 'UPI'"
-                  [class.text-indigo-700]="paymentMethod === 'UPI'"
-                  [class.border-slate-200]="paymentMethod !== 'UPI'"
-                  [class.text-slate-600]="paymentMethod !== 'UPI'">
-                  <i class="bi bi-qr-code text-xl"></i> UPI / QR
-                </button>
-                <button type="button" (click)="paymentMethod = 'CASH'"
-                  class="flex flex-col items-center gap-1 py-3 rounded-xl text-sm font-semibold border-2 transition-all duration-200"
-                  [class.border-emerald-500]="paymentMethod === 'CASH'"
-                  [class.bg-emerald-50]="paymentMethod === 'CASH'"
-                  [class.text-emerald-700]="paymentMethod === 'CASH'"
-                  [class.border-slate-200]="paymentMethod !== 'CASH'"
-                  [class.text-slate-600]="paymentMethod !== 'CASH'">
-                  <i class="bi bi-cash-coin text-xl"></i> Cash
-                </button>
+              <div class="summary-row">
+                <span class="s-label">Slot</span>
+                <span class="s-value">#{{ exitedLog()!.slotId }}</span>
+              </div>
+              <div class="summary-row">
+                <span class="s-label">Duration</span>
+                <span class="s-value">{{ formatDuration(exitedLog()!.durationMinutes) }}</span>
               </div>
             </div>
-            @if (error()) {
-              <div class="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{{ error() }}</div>
-            }
+          }
+          <div>
+            <label class="form-label" style="margin-bottom:0.5rem">Select Payment Method</label>
+            <div class="payment-options-grid">
+              <button type="button" (click)="paymentMethod = 'UPI'"
+                class="payment-option-btn"
+                [class.selected--upi]="paymentMethod === 'UPI'">
+                <i class="bi bi-qr-code"></i> UPI / QR
+              </button>
+              <button type="button" (click)="paymentMethod = 'CASH'"
+                class="payment-option-btn"
+                [class.selected--cash]="paymentMethod === 'CASH'">
+                <i class="bi bi-cash-coin"></i> Cash
+              </button>
+            </div>
           </div>
+          @if (error()) {
+            <div class="form-error-box">{{ error() }}</div>
+          }
         }
 
-        <!-- ── STEP 2a: CASH confirmation ────────────────────────── -->
+        <!-- STEP 2a: CASH confirmation -->
         @if (awaitingConfirmation() && paymentMethod === 'CASH') {
-          <div class="space-y-4">
-            <div class="text-center bg-emerald-50 border-2 border-emerald-300 rounded-2xl p-6">
-              <i class="bi bi-cash-coin text-5xl text-emerald-600 block mb-2"></i>
-              <p class="text-sm text-slate-500 mb-1">Amount to collect from customer</p>
-              <p class="text-4xl font-bold text-emerald-700">₹{{ generatedInvoice()!.amount | number:'1.2-2' }}</p>
-            </div>
-            <div class="bg-slate-50 rounded-xl p-4 space-y-1.5 text-sm">
-              <div class="flex justify-between">
-                <span class="text-slate-500">Vehicle</span>
-                <span class="font-semibold">{{ generatedInvoice()!.vehicleNumber }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-slate-500">Duration</span>
-                <span class="font-semibold">{{ formatDuration(generatedInvoice()!.durationMinutes) }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-slate-500">Invoice #</span>
-                <span class="font-semibold">{{ generatedInvoice()!.invoiceId }}</span>
-              </div>
-            </div>
-            <p class="text-xs text-slate-400 text-center">Collect the cash from the customer, then confirm below.</p>
+          <div class="cash-display">
+            <i class="bi bi-cash-coin cash-display-icon"></i>
+            <p class="cash-hint">Amount to collect from customer</p>
+            <p class="cash-amount">₹{{ generatedInvoice()!.amount | number:'1.2-2' }}</p>
           </div>
+          <div class="summary-box">
+            <div class="summary-row">
+              <span class="s-label">Vehicle</span>
+              <span class="s-value">{{ generatedInvoice()!.vehicleNumber }}</span>
+            </div>
+            <div class="summary-row">
+              <span class="s-label">Duration</span>
+              <span class="s-value">{{ formatDuration(generatedInvoice()!.durationMinutes) }}</span>
+            </div>
+            <div class="summary-row">
+              <span class="s-label">Invoice #</span>
+              <span class="s-value">{{ generatedInvoice()!.invoiceId }}</span>
+            </div>
+          </div>
+          <p class="cash-instruction">Collect the cash from the customer, then confirm below.</p>
         }
 
-        <!-- ── STEP 2b: UPI confirmation ─────────────────────────── -->
+        <!-- STEP 2b: UPI confirmation -->
         @if (awaitingConfirmation() && paymentMethod === 'UPI') {
-          <div class="space-y-4">
-            <div class="text-center">
-              <p class="text-sm text-slate-500 mb-1">Ask the customer to scan &amp; pay</p>
-              @if (generatedInvoice()!.paymentQRCodeBase64) {
-                <img [src]="'data:image/png;base64,' + generatedInvoice()!.paymentQRCodeBase64"
-                  alt="UPI QR" class="w-44 h-44 mx-auto rounded-xl border border-slate-200 shadow" />
-              }
-              <p class="mt-3 text-2xl font-bold text-indigo-700">₹{{ generatedInvoice()!.amount | number:'1.2-2' }}</p>
-            </div>
-            <div class="bg-slate-50 rounded-xl p-4 space-y-1.5 text-sm">
-              <div class="flex justify-between">
-                <span class="text-slate-500">Vehicle</span>
-                <span class="font-semibold">{{ generatedInvoice()!.vehicleNumber }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-slate-500">Duration</span>
-                <span class="font-semibold">{{ formatDuration(generatedInvoice()!.durationMinutes) }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-slate-500">Invoice #</span>
-                <span class="font-semibold">{{ generatedInvoice()!.invoiceId }}</span>
-              </div>
-            </div>
-            <p class="text-xs text-slate-400 text-center">Once the customer has completed the UPI payment, confirm below.</p>
+          <div class="upi-display">
+            <p class="upi-hint">Ask the customer to scan &amp; pay</p>
+            @if (generatedInvoice()!.paymentQRCodeBase64) {
+              <img [src]="'data:image/png;base64,' + generatedInvoice()!.paymentQRCodeBase64"
+                alt="UPI QR" class="qr-image" />
+            }
+            <p class="upi-amount">₹{{ generatedInvoice()!.amount | number:'1.2-2' }}</p>
           </div>
+          <div class="summary-box">
+            <div class="summary-row">
+              <span class="s-label">Vehicle</span>
+              <span class="s-value">{{ generatedInvoice()!.vehicleNumber }}</span>
+            </div>
+            <div class="summary-row">
+              <span class="s-label">Duration</span>
+              <span class="s-value">{{ formatDuration(generatedInvoice()!.durationMinutes) }}</span>
+            </div>
+            <div class="summary-row">
+              <span class="s-label">Invoice #</span>
+              <span class="s-value">{{ generatedInvoice()!.invoiceId }}</span>
+            </div>
+          </div>
+          <p class="cash-instruction">Once the customer has completed the UPI payment, confirm below.</p>
         }
 
-        <!-- ── STEP 3: Payment done ───────────────────────────────── -->
+        <!-- STEP 3: Payment done -->
         @if (paymentDone()) {
-          <div class="text-center space-y-4">
-            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
-              <i class="bi bi-check-circle-fill text-3xl"></i>
+          <div class="payment-done">
+            <div class="success-icon-circle" style="margin-bottom:1rem">
+              <i class="bi bi-check-circle-fill"></i>
             </div>
-            <div>
-              <h4 class="font-bold text-slate-800 text-lg">Payment Confirmed!</h4>
-              <p class="text-slate-500 text-sm mt-1">Invoice #{{ generatedInvoice()!.invoiceId }} · {{ paymentMethod }}</p>
+            <h4>Payment Confirmed!</h4>
+            <p>Invoice #{{ generatedInvoice()!.invoiceId }} · {{ paymentMethod }}</p>
+          </div>
+          <div class="summary-box">
+            <div class="summary-row">
+              <span class="s-label">Vehicle</span>
+              <span class="s-value">{{ generatedInvoice()!.vehicleNumber }}</span>
             </div>
-            <div class="bg-slate-50 rounded-xl p-4 space-y-2 text-sm text-left">
-              <div class="flex justify-between">
-                <span class="text-slate-500">Vehicle</span>
-                <span class="font-semibold">{{ generatedInvoice()!.vehicleNumber }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-slate-500">Duration</span>
-                <span class="font-semibold">{{ formatDuration(generatedInvoice()!.durationMinutes) }}</span>
-              </div>
-              <div class="flex justify-between border-t border-slate-200 pt-2 mt-2">
-                <span class="text-slate-700 font-semibold">Amount Paid</span>
-                <span class="text-emerald-600 font-bold text-base">₹{{ generatedInvoice()!.amount | number:'1.2-2' }}</span>
-              </div>
+            <div class="summary-row">
+              <span class="s-label">Duration</span>
+              <span class="s-value">{{ formatDuration(generatedInvoice()!.durationMinutes) }}</span>
+            </div>
+            <div class="summary-row summary-row--total">
+              <span class="s-label">Amount Paid</span>
+              <span class="s-value">₹{{ generatedInvoice()!.amount | number:'1.2-2' }}</span>
             </div>
           </div>
         }
-
 
       </div>
 
       <!-- Footer buttons -->
-      <div class="flex justify-between gap-2 px-6 pb-5">
-        <!-- STEP 1 -->
+      <div class="modal-footer modal-footer--between">
         @if (!awaitingConfirmation() && !paymentDone()) {
-          <button (click)="closeInvoiceModal()" [disabled]="generatingInvoice()"
-            class="flex items-center gap-1 text-sm text-red-500 hover:text-red-700 px-3 py-2 rounded-lg border border-red-200 hover:bg-red-50 transition-all disabled:opacity-50">
+          <button (click)="closeInvoiceModal()" [disabled]="generatingInvoice()" class="btn-back">
             <i class="bi bi-arrow-left"></i> Back
           </button>
-          <button (click)="proceedToConfirm()" [disabled]="generatingInvoice()"
-            class="btn-primary-tw flex items-center gap-1.5">
+          <button (click)="proceedToConfirm()" [disabled]="generatingInvoice()" class="btn-primary-tw">
             @if (generatingInvoice()) {
-              <svg class="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+              <svg class="animate-spin btn-spinner" fill="none" viewBox="0 0 24 24">
+                <circle class="spinner-track" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="spinner-fill" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
               </svg>
             }
             Continue <i class="bi bi-arrow-right"></i>
           </button>
         }
-        <!-- STEP 2 (CASH) -->
         @if (awaitingConfirmation() && paymentMethod === 'CASH') {
-          <button (click)="backToMethodSelect()" class="btn-secondary-tw flex items-center gap-1">
+          <button (click)="backToMethodSelect()" class="btn-secondary-tw">
             <i class="bi bi-arrow-left"></i> Change Method
           </button>
-          <button (click)="confirmAndPay()" [disabled]="generatingInvoice()"
-            class="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-200 disabled:opacity-60 text-sm">
+          <button (click)="confirmAndPay()" [disabled]="generatingInvoice()" class="btn-emerald">
             @if (generatingInvoice()) {
-              <svg class="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+              <svg class="animate-spin btn-spinner" fill="none" viewBox="0 0 24 24">
+                <circle class="spinner-track" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="spinner-fill" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
               </svg>
             }
             <i class="bi bi-check-lg"></i> Cash Received
           </button>
         }
-        <!-- STEP 2 (UPI) -->
         @if (awaitingConfirmation() && paymentMethod === 'UPI') {
-          <button (click)="backToMethodSelect()" class="btn-secondary-tw flex items-center gap-1">
+          <button (click)="backToMethodSelect()" class="btn-secondary-tw">
             <i class="bi bi-arrow-left"></i> Change Method
           </button>
-          <button (click)="confirmAndPay()" [disabled]="generatingInvoice()"
-            class="btn-primary-tw flex items-center gap-1.5">
+          <button (click)="confirmAndPay()" [disabled]="generatingInvoice()" class="btn-primary-tw">
             @if (generatingInvoice()) {
-              <svg class="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+              <svg class="animate-spin btn-spinner" fill="none" viewBox="0 0 24 24">
+                <circle class="spinner-track" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="spinner-fill" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
               </svg>
             }
             <i class="bi bi-check-lg"></i> Payment Received
           </button>
         }
-        <!-- STEP 3 -->
         @if (paymentDone()) {
           <div></div>
           <button (click)="closeInvoiceModal()" class="btn-primary-tw">Done</button>

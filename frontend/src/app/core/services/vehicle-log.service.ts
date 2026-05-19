@@ -34,6 +34,6 @@ export class VehicleLogService {
   }
 
   getAll() {
-    return this.http.get<VehicleLogResponse[]>(`${this.base}/`);
+    return this.http.get<VehicleLogResponse[]>(`${this.base}`);
   }
 }

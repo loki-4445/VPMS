@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+﻿import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SlotService } from '../../core/services/slot.service';
@@ -9,7 +9,7 @@ import { SlotResponse } from '../../models/slot.models';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './slots.component.html',
-  styleUrls: ['./slots.component.scss']
+  styleUrls: ['./slots.component.css']
 })
 export class SlotsComponent implements OnInit {
   private svc = inject(SlotService);

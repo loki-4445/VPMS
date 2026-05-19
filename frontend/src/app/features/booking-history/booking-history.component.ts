@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+﻿import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReservationService } from '../../core/services/reservation.service';
@@ -13,7 +13,7 @@ import { AdminBillDTO } from '../../models/invoice.models';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './booking-history.component.html',
-  styleUrls: ['./booking-history.component.scss']
+  styleUrls: ['./booking-history.component.css']
 })
 export class BookingHistoryComponent implements OnInit {
   private resSvc = inject(ReservationService);
@@ -80,8 +80,9 @@ export class BookingHistoryComponent implements OnInit {
       .toFixed(2);
   }
 
-  formatDuration(mins?: number) {
-    if (!mins) return '—';
+  formatDuration(mins?: number | null) {
+    if (mins === undefined || mins === null) return '—';
+    if (mins === 0) return '< 1 min';
     const h = Math.floor(mins / 60), m = mins % 60;
     return h > 0 ? `${h}h ${m}m` : `${m}m`;
   }
