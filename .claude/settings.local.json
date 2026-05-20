@@ -20,7 +20,10 @@
       "Read(//c/Program Files/**)",
       "Bash(export JAVA_HOME=\"/c/Program Files/Java/jdk-21\")",
       "Bash(timeout 30 ./mvnw spring-boot:run)",
-      "Bash(./mvnw compile *)"
+      "Bash(./mvnw compile *)",
+      "Bash(Get-ChildItem -Force)",
+      "Bash(Select-Object -Property Name, PSIsContainer)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\2486060\\\\Documents\\\\VPMS\\\\frontend\\\\src\" -Recurse -Name -Directory)"
     ]
   }
 }
