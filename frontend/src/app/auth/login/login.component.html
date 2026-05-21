@@ -43,6 +43,7 @@
           <span>Account created! You can now sign in.</span>
         </div>
       }
+      <!-- API-level error (wrong credentials / server down) -->
       @if (error()) {
         <div class="alert alert-error animate-fade-in">
           <i class="bi bi-exclamation-circle-fill"></i>
@@ -50,30 +51,59 @@
         </div>
       }
 
-      <form (ngSubmit)="login()" class="auth-form">
-        <div>
+      <form (ngSubmit)="login()" novalidate class="auth-form">
+
+        <!-- ── Email ──────────────────────────────────────────── -->
+        <div class="field-wrap">
           <label class="form-label">Email Address</label>
-          <div class="auth-input-group">
+          <div class="auth-input-group"
+               [class.input-state--error]="inputState('email') === 'error'"
+               [class.input-state--ok]="inputState('email') === 'ok'">
             <span class="auth-input-prefix"><i class="bi bi-envelope"></i></span>
             <input type="email" class="auth-input"
               placeholder="you@example.com"
-              [(ngModel)]="email" name="email" required autocomplete="email" />
+              [(ngModel)]="email" name="email"
+              required autocomplete="email"
+              (blur)="touch('email')" />
+            <span class="auth-input-status">
+              @if (inputState('email') === 'ok') {
+                <i class="bi bi-check-circle-fill status-ok"></i>
+              }
+              @if (inputState('email') === 'error') {
+                <i class="bi bi-x-circle-fill status-error"></i>
+              }
+            </span>
           </div>
+          @if (showEmailError) {
+            <p class="field-error animate-fade-in">
+              <i class="bi bi-exclamation-circle"></i> {{ showEmailError }}
+            </p>
+          }
         </div>
 
-        <div>
+        <!-- ── Password ───────────────────────────────────────── -->
+        <div class="field-wrap">
           <label class="form-label">Password</label>
-          <div class="auth-input-group">
+          <div class="auth-input-group"
+               [class.input-state--error]="inputState('password') === 'error'"
+               [class.input-state--ok]="inputState('password') === 'ok'">
             <span class="auth-input-prefix"><i class="bi bi-lock"></i></span>
             <input [type]="showPassword() ? 'text' : 'password'"
               class="auth-input"
-              placeholder="Enter your password"
-              [(ngModel)]="password" name="password" required autocomplete="current-password" />
+              placeholder="Min. 6 characters"
+              [(ngModel)]="password" name="password"
+              required autocomplete="current-password"
+              (blur)="touch('password')" />
             <button type="button" class="auth-input-suffix"
               (click)="showPassword.update(v => !v)">
               <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()"></i>
             </button>
           </div>
+          @if (showPasswordError) {
+            <p class="field-error animate-fade-in">
+              <i class="bi bi-exclamation-circle"></i> {{ showPasswordError }}
+            </p>
+          }
         </div>
 
         <button type="submit" class="auth-submit-btn" [disabled]="loading()">

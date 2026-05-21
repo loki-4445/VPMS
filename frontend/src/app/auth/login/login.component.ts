@@ -1,4 +1,4 @@
-﻿import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
@@ -18,15 +18,53 @@ export class LoginComponent implements OnInit {
 
   email = '';
   password = '';
-  loading = signal(false);
-  error = signal('');
+
+  loading    = signal(false);
+  error      = signal('');
   showPassword = signal(false);
   registered = signal(false);
+  submitted  = signal(false);
+
+  touched = { email: false, password: false };
 
   ngOnInit() {
     this.route.queryParams.subscribe(p => {
       if (p['registered'] === 'true') this.registered.set(true);
     });
+  }
+
+  /** Mark a field dirty on blur so its error appears immediately. */
+  touch(field: keyof typeof this.touched) {
+    this.touched[field] = true;
+  }
+
+  // ── Validation rules (always computed live) ──────────────────────
+
+  get emailError(): string | null {
+    const v = this.email.trim();
+    if (!v) return 'Email is required.';
+    if (!v.includes('@')) return 'Email must contain @.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v))
+      return 'Enter a valid email address (e.g. you@example.com).';
+    return null;
+  }
+
+  get passwordError(): string | null {
+    const v = this.password;
+    if (!v) return 'Password is required.';
+    if (v.length < 6) return `Password must be at least 6 characters (${v.length}/6).`;
+    return null;
+  }
+
+  // ── Show only after the field is touched OR form submitted ────────
+
+  get showEmailError()    { return (this.touched.email    || this.submitted()) && this.emailError; }
+  get showPasswordError() { return (this.touched.password || this.submitted()) && this.passwordError; }
+
+  /** Used to colour the input border: 'error' | 'ok' | '' */
+  inputState(field: 'email' | 'password'): 'error' | 'ok' | '' {
+    if (!this.touched[field] && !this.submitted()) return '';
+    return (field === 'email' ? this.emailError : this.passwordError) ? 'error' : 'ok';
   }
 
   private parseError(err: any, fallback: string): string {
@@ -38,10 +76,12 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
-    if (!this.email || !this.password) {
-      this.error.set('Please enter email and password.');
-      return;
-    }
+    // Mark everything touched so all errors surface at once
+    this.submitted.set(true);
+    this.touched = { email: true, password: true };
+
+    if (this.emailError || this.passwordError) return;
+
     this.loading.set(true);
     this.error.set('');
 

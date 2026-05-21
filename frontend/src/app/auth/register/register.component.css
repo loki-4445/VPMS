@@ -112,6 +112,22 @@
   margin-bottom: 1.25rem;
 }
 
+/* ── Alert banners (API-level messages) ─────────────────────────── */
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+}
+.alert-error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+
+/* ── Field wrapper (label + input group + message) ──────────────── */
+.field-wrap { display: flex; flex-direction: column; }
+
 /* ── Form ────────────────────────────────────────────────────────── */
 .auth-form {
   display: flex;
@@ -179,6 +195,30 @@
 
   &:hover { color: #475569; }
 }
+
+/* Small tick/cross icon inside the input group on the right */
+.auth-input-status {
+  display: flex;
+  align-items: center;
+  padding: 0 0.625rem;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+.status-ok    { color: #16a34a; }
+.status-error { color: #dc2626; }
+
+/* ── Per-field validation messages ──────────────────────────────── */
+.field-error,
+.field-ok {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+  line-height: 1.4;
+}
+.field-error { color: #dc2626; }
+.field-ok    { color: #16a34a; }
 
 /* ── Submit button ──────────────────────────────────────────────── */
 .auth-submit-btn {

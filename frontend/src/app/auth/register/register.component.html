@@ -39,6 +39,7 @@
       <h3 class="auth-form-title">Create account</h3>
       <p class="auth-form-sub">Fill in your details to get started</p>
 
+      <!-- API-level error -->
       @if (error()) {
         <div class="alert alert-error animate-fade-in">
           <i class="bi bi-exclamation-circle-fill" style="flex-shrink:0"></i>
@@ -48,78 +49,151 @@
 
       <form (ngSubmit)="register()" novalidate class="auth-form">
 
-        <!-- Full Name -->
-        <div>
+        <!-- ── Full Name ───────────────────────────────────────── -->
+        <div class="field-wrap">
           <label class="form-label">Full Name</label>
-          <div class="auth-input-group">
+          <div class="auth-input-group"
+               [class.input-state--error]="inputState('name') === 'error'"
+               [class.input-state--ok]="inputState('name') === 'ok'">
             <span class="auth-input-prefix"><i class="bi bi-person"></i></span>
             <input type="text" class="auth-input"
               placeholder="Your full name"
-              [(ngModel)]="form.name" name="name" required autocomplete="name" />
+              [(ngModel)]="form.name" name="name"
+              required autocomplete="name"
+              (blur)="touch('name')" />
+            <span class="auth-input-status">
+              @if (showNameOk) { <i class="bi bi-check-circle-fill status-ok"></i> }
+              @if (inputState('name') === 'error') { <i class="bi bi-x-circle-fill status-error"></i> }
+            </span>
           </div>
+          @if (showNameError) {
+            <p class="field-error animate-fade-in">
+              <i class="bi bi-exclamation-circle"></i> {{ showNameError }}
+            </p>
+          }
+          @if (showNameOk) {
+            <p class="field-ok animate-fade-in">
+              <i class="bi bi-check-circle"></i> Looks good!
+            </p>
+          }
         </div>
 
-        <!-- Email -->
-        <div>
+        <!-- ── Email ──────────────────────────────────────────── -->
+        <div class="field-wrap">
           <label class="form-label">Email Address</label>
-          <div class="auth-input-group">
+          <div class="auth-input-group"
+               [class.input-state--error]="inputState('email') === 'error'"
+               [class.input-state--ok]="inputState('email') === 'ok'">
             <span class="auth-input-prefix"><i class="bi bi-envelope"></i></span>
             <input type="email" class="auth-input"
               placeholder="you@example.com"
-              [(ngModel)]="form.email" name="email" required autocomplete="email" />
+              [(ngModel)]="form.email" name="email"
+              required autocomplete="email"
+              (blur)="touch('email')" />
+            <span class="auth-input-status">
+              @if (showEmailOk) { <i class="bi bi-check-circle-fill status-ok"></i> }
+              @if (inputState('email') === 'error') { <i class="bi bi-x-circle-fill status-error"></i> }
+            </span>
           </div>
+          @if (showEmailError) {
+            <p class="field-error animate-fade-in">
+              <i class="bi bi-exclamation-circle"></i> {{ showEmailError }}
+            </p>
+          }
+          @if (showEmailOk) {
+            <p class="field-ok animate-fade-in">
+              <i class="bi bi-check-circle"></i> Valid email address
+            </p>
+          }
         </div>
 
-        <!-- Phone -->
-        <div>
+        <!-- ── Phone ──────────────────────────────────────────── -->
+        <div class="field-wrap">
           <label class="form-label">Phone Number</label>
-          <div class="auth-input-group">
+          <div class="auth-input-group"
+               [class.input-state--error]="inputState('phoneNumber') === 'error'"
+               [class.input-state--ok]="inputState('phoneNumber') === 'ok'">
             <span class="auth-input-prefix"><i class="bi bi-telephone"></i></span>
             <input type="tel" class="auth-input"
               placeholder="10-digit mobile number"
               [(ngModel)]="form.phoneNumber" name="phoneNumber"
-              maxlength="10" required autocomplete="tel" />
+              maxlength="10" required autocomplete="tel"
+              (input)="onPhoneInput()"
+              (blur)="touch('phoneNumber')" />
+            <span class="auth-input-status">
+              @if (showPhoneOk) { <i class="bi bi-check-circle-fill status-ok"></i> }
+              @if (inputState('phoneNumber') === 'error') { <i class="bi bi-x-circle-fill status-error"></i> }
+            </span>
           </div>
+          @if (showPhoneError) {
+            <p class="field-error animate-fade-in">
+              <i class="bi bi-exclamation-circle"></i> {{ showPhoneError }}
+            </p>
+          }
+          @if (showPhoneOk) {
+            <p class="field-ok animate-fade-in">
+              <i class="bi bi-check-circle"></i> Valid phone number
+            </p>
+          }
         </div>
 
-        <!-- Password -->
-        <div>
+        <!-- ── Password ───────────────────────────────────────── -->
+        <div class="field-wrap">
           <label class="form-label">Password</label>
-          <div class="auth-input-group">
+          <div class="auth-input-group"
+               [class.input-state--error]="inputState('password') === 'error'"
+               [class.input-state--ok]="inputState('password') === 'ok'">
             <span class="auth-input-prefix"><i class="bi bi-lock"></i></span>
             <input [type]="showPassword() ? 'text' : 'password'"
               class="auth-input"
               placeholder="Min. 6 characters"
-              [(ngModel)]="form.password" name="password" required autocomplete="new-password" />
+              [(ngModel)]="form.password" name="password"
+              required autocomplete="new-password"
+              (blur)="touch('password')" />
             <button type="button" class="auth-input-suffix"
               (click)="showPassword.update(v => !v)">
               <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()"></i>
             </button>
           </div>
+          @if (showPasswordError) {
+            <p class="field-error animate-fade-in">
+              <i class="bi bi-exclamation-circle"></i> {{ showPasswordError }}
+            </p>
+          }
+          @if (showPasswordOk) {
+            <p class="field-ok animate-fade-in">
+              <i class="bi bi-check-circle"></i> Strong enough!
+            </p>
+          }
         </div>
 
-        <!-- Confirm Password -->
-        <div>
+        <!-- ── Confirm Password ───────────────────────────────── -->
+        <div class="field-wrap">
           <label class="form-label">Confirm Password</label>
           <div class="auth-input-group"
-            [class.input-state--error]="passwordsMismatch"
-            [class.input-state--ok]="passwordsMatch">
+               [class.input-state--error]="inputState('confirmPassword') === 'error'"
+               [class.input-state--ok]="inputState('confirmPassword') === 'ok'">
             <span class="auth-input-prefix"><i class="bi bi-lock-fill"></i></span>
             <input [type]="showConfirm() ? 'text' : 'password'"
               class="auth-input"
               placeholder="Re-enter your password"
               [(ngModel)]="form.confirmPassword" name="confirmPassword"
-              required autocomplete="new-password" />
+              required autocomplete="new-password"
+              (blur)="touch('confirmPassword')" />
             <button type="button" class="auth-input-suffix"
               (click)="showConfirm.update(v => !v)">
               <i class="bi" [class.bi-eye]="!showConfirm()" [class.bi-eye-slash]="showConfirm()"></i>
             </button>
           </div>
-          @if (passwordsMismatch) {
-            <p class="form-error"><i class="bi bi-x-circle" style="margin-right:0.25rem"></i>Passwords do not match</p>
+          @if (showConfirmError) {
+            <p class="field-error animate-fade-in">
+              <i class="bi bi-exclamation-circle"></i> {{ showConfirmError }}
+            </p>
           }
-          @if (passwordsMatch) {
-            <p class="form-ok"><i class="bi bi-check-circle" style="margin-right:0.25rem"></i>Passwords match</p>
+          @if (showConfirmOk) {
+            <p class="field-ok animate-fade-in">
+              <i class="bi bi-check-circle"></i> Passwords match
+            </p>
           }
         </div>
 
