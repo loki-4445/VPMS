@@ -12,6 +12,7 @@ import { VehicleLogsComponent } from './features/vehicle-logs/vehicle-logs.compo
 import { InvoicesComponent } from './features/invoices/invoices.component';
 import { ProfileComponent } from './features/profile/profile.component';
 import { BookingHistoryComponent } from './features/booking-history/booking-history.component';
+import { FallbackComponent } from './features/fallback/fallback';
 
 export const routes: Routes = [
   { path: '', component: LandingComponent, pathMatch: 'full' },
@@ -32,5 +33,5 @@ export const routes: Routes = [
       { path: 'booking-history', component: BookingHistoryComponent },
     ]
   },
-  { path: '**', redirectTo: '' }
+  { path: '**', component:FallbackComponent }
 ];
