@@ -75,7 +75,10 @@
 /* ── Base reset ───────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { font-size: 16px; }
+html { 
+  font-size: 16px; 
+  overscroll-behavior: none;
+}
 
 body {
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -83,6 +86,7 @@ body {
   color: #1e293b;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
 }
 
 a    { text-decoration: none; color: inherit; }

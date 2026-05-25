@@ -632,14 +632,60 @@
   margin: 0;
 }
 
+/* ── Floating car ────────────────────────────────────────────────── */
+@keyframes car-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-16px); }
+}
+
+@keyframes shadow-breathe {
+  0%, 100% { transform: scaleX(1);    opacity: 0.55; }
+  50%       { transform: scaleX(0.80); opacity: 0.30; }
+}
+
+.hero-car-wrap {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  margin-top: 2.5rem;
+}
+
+.hero-car-svg {
+  width: 100%;
+  max-width: 26rem;
+  height: auto;
+  animation: car-float 3.6s ease-in-out infinite;
+  /* drop shadow so the car appears lifted */
+  filter: drop-shadow(0 22px 36px rgba(185,28,28,0.55))
+          drop-shadow(0 6px 14px rgba(0,0,0,0.40));
+}
+
+/* Elliptical ground shadow (stays still while car floats up) */
+.car-ground-shadow {
+  width: 68%;
+  height: 18px;
+  background: radial-gradient(ellipse at center,
+    rgba(0,0,0,0.50) 0%,
+    rgba(0,0,0,0.20) 45%,
+    transparent 75%
+  );
+  border-radius: 50%;
+  margin-top: -6px;
+  animation: shadow-breathe 3.6s ease-in-out infinite;
+}
+
 /* ── Responsive tweaks ───────────────────────────────────────────── */
 @media (min-width: 768px) {
   .hero-section { flex-direction: row; text-align: left; gap: 3rem; justify-content: space-between; }
-  .hero-container { text-align: left; }
+  .hero-container { text-align: left; flex: 1; }
   .hero-badge { align-self: flex-start; }
   .hero-cta { justify-content: flex-start; }
   .hero-stats { justify-content: flex-start; }
-  .hero-card-preview { flex-shrink: 0; margin-top: 0; }
+  .hero-car-wrap { margin-top: 0; max-width: 44%; }
+  .hero-car-svg  { max-width: 32rem; }
   .step-arrow { display: block; }
 }
 
@@ -647,4 +693,5 @@
   .step-arrow { display: none; }
   .hero-stats { gap: 1rem; padding: 1rem; }
   .stat-divider { display: none; }
+  .hero-car-svg { max-width: 20rem; }
 }

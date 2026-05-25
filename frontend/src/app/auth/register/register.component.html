@@ -46,60 +46,95 @@
         </div>
       }
 
-      <form (ngSubmit)="register()" novalidate class="auth-form">
+      <form [formGroup]="form" (ngSubmit)="register()" novalidate class="auth-form">
 
         <!-- Full Name -->
-        <div>
+        <div class="field-group">
           <label class="form-label">Full Name</label>
-          <div class="auth-input-group">
+          <div class="auth-input-group"
+            [class.input-state--error]="nameCtrl.invalid && nameCtrl.touched"
+            [class.input-state--ok]="nameCtrl.valid && nameCtrl.dirty">
             <span class="auth-input-prefix"><i class="bi bi-person"></i></span>
             <input type="text" class="auth-input"
               placeholder="Your full name"
-              [(ngModel)]="form.name" name="name" required autocomplete="name" />
+              formControlName="name"
+              autocomplete="name" />
           </div>
+          @if (nameCtrl.touched && nameCtrl.hasError('required')) {
+            <p class="field-error"><i class="bi bi-x-circle"></i> Full name is required</p>
+          } @else if (nameCtrl.touched && nameCtrl.hasError('pattern')) {
+            <p class="field-error"><i class="bi bi-x-circle"></i> Only letters and spaces allowed (2–50 characters)</p>
+          }
         </div>
 
         <!-- Email -->
-        <div>
+        <div class="field-group">
           <label class="form-label">Email Address</label>
-          <div class="auth-input-group">
+          <div class="auth-input-group"
+            [class.input-state--error]="emailCtrl.invalid && emailCtrl.touched"
+            [class.input-state--ok]="emailCtrl.valid && emailCtrl.dirty">
             <span class="auth-input-prefix"><i class="bi bi-envelope"></i></span>
             <input type="email" class="auth-input"
               placeholder="you@example.com"
-              [(ngModel)]="form.email" name="email" required autocomplete="email" />
+              formControlName="email"
+              autocomplete="email" />
           </div>
+          @if (emailCtrl.touched && emailCtrl.hasError('required')) {
+            <p class="field-error"><i class="bi bi-x-circle"></i> Email is required</p>
+          } @else if (emailCtrl.touched && emailCtrl.hasError('pattern')) {
+            <p class="field-error"><i class="bi bi-x-circle"></i> Enter a valid email address (e.g. you&#64;example.com)</p>
+          }
         </div>
 
         <!-- Phone -->
-        <div>
+        <div class="field-group">
           <label class="form-label">Phone Number</label>
-          <div class="auth-input-group">
+          <div class="auth-input-group"
+            [class.input-state--error]="phoneCtrl.invalid && phoneCtrl.touched"
+            [class.input-state--ok]="phoneCtrl.valid && phoneCtrl.dirty">
             <span class="auth-input-prefix"><i class="bi bi-telephone"></i></span>
             <input type="tel" class="auth-input"
               placeholder="10-digit mobile number"
-              [(ngModel)]="form.phoneNumber" name="phoneNumber"
-              maxlength="10" required autocomplete="tel" />
+              formControlName="phoneNumber"
+              maxlength="10"
+              autocomplete="tel" />
           </div>
+          @if (phoneCtrl.touched && phoneCtrl.hasError('required')) {
+            <p class="field-error"><i class="bi bi-x-circle"></i> Phone number is required</p>
+          } @else if (phoneCtrl.touched && phoneCtrl.hasError('pattern')) {
+            <p class="field-error"><i class="bi bi-x-circle"></i> Must be exactly 10 digits (numbers only)</p>
+          }
         </div>
 
         <!-- Password -->
-        <div>
+        <div class="field-group">
           <label class="form-label">Password</label>
-          <div class="auth-input-group">
+          <div class="auth-input-group"
+            [class.input-state--error]="pwdCtrl.invalid && pwdCtrl.touched"
+            [class.input-state--ok]="pwdCtrl.valid && pwdCtrl.dirty">
             <span class="auth-input-prefix"><i class="bi bi-lock"></i></span>
             <input [type]="showPassword() ? 'text' : 'password'"
               class="auth-input"
-              placeholder="Min. 6 characters"
-              [(ngModel)]="form.password" name="password" required autocomplete="new-password" />
+              placeholder="Min. 6 chars, include a letter and number"
+              formControlName="password"
+              autocomplete="new-password" />
             <button type="button" class="auth-input-suffix"
               (click)="showPassword.update(v => !v)">
               <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()"></i>
             </button>
           </div>
+          @if (pwdCtrl.touched && pwdCtrl.hasError('required')) {
+            <p class="field-error"><i class="bi bi-x-circle"></i> Password is required</p>
+          } @else if (pwdCtrl.touched && (pwdCtrl.hasError('minlength') || pwdCtrl.hasError('pattern'))) {
+            <p class="field-error"><i class="bi bi-x-circle"></i> Min. 6 characters with at least 1 letter and 1 number</p>
+          }
+          @if (pwdCtrl.valid) {
+            <p class="field-ok"><i class="bi bi-check-circle"></i> Strong password</p>
+          }
         </div>
 
         <!-- Confirm Password -->
-        <div>
+        <div class="field-group">
           <label class="form-label">Confirm Password</label>
           <div class="auth-input-group"
             [class.input-state--error]="passwordsMismatch"
@@ -108,18 +143,19 @@
             <input [type]="showConfirm() ? 'text' : 'password'"
               class="auth-input"
               placeholder="Re-enter your password"
-              [(ngModel)]="form.confirmPassword" name="confirmPassword"
-              required autocomplete="new-password" />
+              formControlName="confirmPassword"
+              autocomplete="new-password" />
             <button type="button" class="auth-input-suffix"
               (click)="showConfirm.update(v => !v)">
               <i class="bi" [class.bi-eye]="!showConfirm()" [class.bi-eye-slash]="showConfirm()"></i>
             </button>
           </div>
-          @if (passwordsMismatch) {
-            <p class="form-error"><i class="bi bi-x-circle" style="margin-right:0.25rem"></i>Passwords do not match</p>
-          }
-          @if (passwordsMatch) {
-            <p class="form-ok"><i class="bi bi-check-circle" style="margin-right:0.25rem"></i>Passwords match</p>
+          @if (confirmCtrl.touched && confirmCtrl.hasError('required')) {
+            <p class="field-error"><i class="bi bi-x-circle"></i> Please confirm your password</p>
+          } @else if (passwordsMismatch) {
+            <p class="field-error"><i class="bi bi-x-circle"></i> Passwords do not match</p>
+          } @else if (passwordsMatch) {
+            <p class="field-ok"><i class="bi bi-check-circle"></i> Passwords match</p>
           }
         </div>
 

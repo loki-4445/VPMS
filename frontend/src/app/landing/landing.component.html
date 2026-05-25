@@ -61,6 +61,190 @@
     </div>
   </div>
 
+  <!-- ── Floating Car Visual ───────────────────────────────────────── -->
+  <div class="hero-car-wrap">
+    <svg class="hero-car-svg" viewBox="0 0 560 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="rcBody" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#f87171"/>
+          <stop offset="100%" stop-color="#b91c1c"/>
+        </linearGradient>
+        <linearGradient id="rcUnder" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#dc2626"/>
+          <stop offset="100%" stop-color="#7f1d1d"/>
+        </linearGradient>
+        <linearGradient id="rcRim" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#e2e8f0"/>
+          <stop offset="100%" stop-color="#94a3b8"/>
+        </linearGradient>
+        <radialGradient id="rcHL" cx="30%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#fef9c3"/>
+          <stop offset="100%" stop-color="#f59e0b"/>
+        </radialGradient>
+        <filter id="rcGlow" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- ══ Main body ══ -->
+      <path d="
+        M 82 170
+        Q 76 182 100 182
+        L 460 182
+        Q 482 182 492 168
+        L 496 148
+        Q 490 124 462 114
+        L 428 108
+        L 402 64
+        Q 396 50 380 50
+        L 196 50
+        Q 180 50 172 64
+        L 148 96
+        L 120 110
+        Q 90 120 78 158
+        Z
+      " fill="url(#rcBody)"/>
+
+      <!-- ══ Underbody / lower sill ══ -->
+      <path d="
+        M 100 182 L 460 182
+        Q 482 182 492 168 L 496 160
+        Q 476 178 452 178 L 108 178
+        Q 84 178 78 162 L 78 170
+        Q 76 182 100 182 Z
+      " fill="url(#rcUnder)"/>
+
+      <!-- ══ Cabin (dark glass zone) ══ -->
+      <path d="
+        M 174 65 L 196 51 L 380 51
+        L 400 65 L 424 106 L 148 106 Z
+      " fill="#0f172a" opacity="0.90"/>
+
+      <!-- ══ Windshield tint ══ -->
+      <path d="M 356 53 L 400 67 L 422 104 L 340 104 Z"
+            fill="#1d4ed8" opacity="0.28"/>
+
+      <!-- ══ Side window tint ══ -->
+      <path d="M 204 51 L 350 51 L 350 104 L 204 104 Z"
+            fill="#1d4ed8" opacity="0.18"/>
+
+      <!-- ══ Rear window tint ══ -->
+      <path d="M 177 64 L 204 53 L 204 104 L 154 104 Z"
+            fill="#1d4ed8" opacity="0.25"/>
+
+      <!-- ══ Window highlight (top reflection) ══ -->
+      <path d="M 210 52 Q 278 44 344 52"
+            stroke="rgba(255,255,255,0.40)" stroke-width="2.5"
+            fill="none" stroke-linecap="round"/>
+
+      <!-- ══ B-pillar & C-pillar ══ -->
+      <rect x="199" y="51" width="8" height="55" rx="2" fill="#ef4444"/>
+      <rect x="347" y="51" width="8" height="55" rx="2" fill="#ef4444"/>
+
+      <!-- ══ Roof highlight ══ -->
+      <path d="M 200 51 Q 288 42 380 51"
+            stroke="rgba(255,255,255,0.50)" stroke-width="3"
+            fill="none" stroke-linecap="round"/>
+
+      <!-- ══ Body shoulder line ══ -->
+      <path d="M 90 150 Q 280 138 484 152"
+            stroke="rgba(255,255,255,0.22)" stroke-width="4"
+            fill="none" stroke-linecap="round"/>
+
+      <!-- ══ Side mirror ══ -->
+      <path d="M 400 104 L 432 96 L 428 112 L 400 112 Z" fill="#dc2626"/>
+      <rect x="414" y="97" width="13" height="11" rx="2"
+            fill="#1e293b" opacity="0.75"/>
+
+      <!-- ══ Door seam ══ -->
+      <path d="M 198 108 L 196 178" stroke="rgba(0,0,0,0.18)" stroke-width="2"/>
+      <path d="M 348 108 L 346 178" stroke="rgba(0,0,0,0.18)" stroke-width="2"/>
+
+      <!-- ══ Door handles ══ -->
+      <rect x="238" y="148" width="28" height="6" rx="3"
+            fill="rgba(255,255,255,0.45)"/>
+      <rect x="368" y="148" width="24" height="6" rx="3"
+            fill="rgba(255,255,255,0.42)"/>
+
+      <!-- ══ Hood crease ══ -->
+      <path d="M 428 110 Q 456 124 472 145"
+            stroke="rgba(255,255,255,0.22)" stroke-width="2"
+            fill="none" stroke-linecap="round"/>
+
+      <!-- ══ HEADLIGHT ══ -->
+      <path d="M 467 116 L 492 126 L 490 155 L 464 157 Z"
+            fill="url(#rcHL)" rx="5"/>
+      <!-- DRL strip -->
+      <rect x="467" y="116" width="22" height="6" rx="3"
+            fill="white" opacity="0.95"/>
+      <!-- Headlight glow -->
+      <ellipse cx="484" cy="138" rx="10" ry="8"
+               fill="rgba(254,249,195,0.55)" filter="url(#rcGlow)"/>
+
+      <!-- ══ TAILLIGHT ══ -->
+      <path d="M 84 152 L 70 158 L 72 172 L 86 172 Z" fill="#fca5a5"/>
+      <path d="M 84 154 L 73 159 L 74 169 L 85 169 Z" fill="#ef4444" opacity="0.9"/>
+      <!-- Taillight glow -->
+      <ellipse cx="72" cy="163" rx="8" ry="6"
+               fill="rgba(239,68,68,0.40)" filter="url(#rcGlow)"/>
+
+      <!-- ══ Front splitter ══ -->
+      <path d="M 454 178 L 494 166 L 496 178 L 454 184 Z" fill="#7f1d1d"/>
+
+      <!-- ══ Rear diffuser ══ -->
+      <path d="M 86 178 L 70 172 L 70 184 L 88 184 Z" fill="#7f1d1d"/>
+
+      <!-- ══ Exhaust ══ -->
+      <circle cx="94" cy="178" r="7" fill="#374151"/>
+      <circle cx="94" cy="178" r="5" fill="#111827"/>
+      <circle cx="94" cy="178" r="2" fill="#1f2937"/>
+
+      <!-- ══ License plates ══ -->
+      <rect x="446" y="163" width="30" height="13" rx="2"
+            fill="rgba(255,255,255,0.30)"/>
+      <rect x="72" y="160" width="24" height="13" rx="2"
+            fill="rgba(255,255,255,0.25)"/>
+
+      <!-- ══ REAR WHEEL ══ -->
+      <circle cx="152" cy="182" r="44" fill="#1e1b4b"/>
+      <circle cx="152" cy="182" r="37" fill="#0f172a"/>
+      <circle cx="152" cy="182" r="24" fill="url(#rcRim)"/>
+      <!-- spokes -->
+      <line x1="152" y1="158" x2="152" y2="206" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+      <line x1="128" y1="182" x2="176" y2="182" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+      <line x1="135" y1="165" x2="169" y2="199" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+      <line x1="169" y1="165" x2="135" y2="199" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+      <!-- rim inner ring -->
+      <circle cx="152" cy="182" r="10" fill="#94a3b8"/>
+      <circle cx="152" cy="182" r="5"  fill="#475569"/>
+      <!-- rim glint -->
+      <path d="M 136 160 Q 122 182 138 204"
+            stroke="rgba(255,255,255,0.28)" stroke-width="2.5"
+            fill="none" stroke-linecap="round"/>
+
+      <!-- ══ FRONT WHEEL ══ -->
+      <circle cx="398" cy="182" r="44" fill="#1e1b4b"/>
+      <circle cx="398" cy="182" r="37" fill="#0f172a"/>
+      <circle cx="398" cy="182" r="24" fill="url(#rcRim)"/>
+      <!-- spokes -->
+      <line x1="398" y1="158" x2="398" y2="206" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+      <line x1="374" y1="182" x2="422" y2="182" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+      <line x1="381" y1="165" x2="415" y2="199" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+      <line x1="415" y1="165" x2="381" y2="199" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+      <!-- rim inner ring -->
+      <circle cx="398" cy="182" r="10" fill="#94a3b8"/>
+      <circle cx="398" cy="182" r="5"  fill="#475569"/>
+      <!-- rim glint -->
+      <path d="M 382 160 Q 368 182 384 204"
+            stroke="rgba(255,255,255,0.28)" stroke-width="2.5"
+            fill="none" stroke-linecap="round"/>
+    </svg>
+
+    <!-- Ground shadow below the car -->
+    <div class="car-ground-shadow"></div>
+  </div>
+
 </section>
 
 <!-- ── Features ───────────────────────────────────────────────────── -->

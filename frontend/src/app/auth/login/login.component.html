@@ -46,34 +46,53 @@
       @if (error()) {
         <div class="alert alert-error animate-fade-in">
           <i class="bi bi-exclamation-circle-fill"></i>
-          <span>{{ error() }}</span>
+          <span style="color: red; margin: 4px;">{{ error() }}</span>
         </div>
       }
 
-      <form (ngSubmit)="login()" class="auth-form">
-        <div>
+      <form [formGroup]="form" (ngSubmit)="login()" novalidate class="auth-form">
+
+        <!-- Email -->
+        <div class="field-group">
           <label class="form-label">Email Address</label>
-          <div class="auth-input-group">
+          <div class="auth-input-group"
+            [class.input-state--error]="emailCtrl.invalid && emailCtrl.touched"
+            [class.input-state--ok]="emailCtrl.valid && emailCtrl.dirty">
             <span class="auth-input-prefix"><i class="bi bi-envelope"></i></span>
             <input type="email" class="auth-input"
               placeholder="you@example.com"
-              [(ngModel)]="email" name="email" required autocomplete="email" />
+              formControlName="email"
+              autocomplete="email" />
           </div>
+          @if (emailCtrl.touched && emailCtrl.hasError('required')) {
+            <p class="field-error"><i class="bi bi-x-circle"></i> Email is required</p>
+          } @else if (emailCtrl.touched && emailCtrl.hasError('pattern')) {
+            <p class="field-error"><i class="bi bi-x-circle"></i> Enter a valid email address</p>
+          }
         </div>
 
-        <div>
+        <!-- Password -->
+        <div class="field-group">
           <label class="form-label">Password</label>
-          <div class="auth-input-group">
+          <div class="auth-input-group"
+            [class.input-state--error]="passwordCtrl.invalid && passwordCtrl.touched"
+            [class.input-state--ok]="passwordCtrl.valid && passwordCtrl.dirty">
             <span class="auth-input-prefix"><i class="bi bi-lock"></i></span>
             <input [type]="showPassword() ? 'text' : 'password'"
               class="auth-input"
               placeholder="Enter your password"
-              [(ngModel)]="password" name="password" required autocomplete="current-password" />
+              formControlName="password"
+              autocomplete="current-password" />
             <button type="button" class="auth-input-suffix"
               (click)="showPassword.update(v => !v)">
               <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()"></i>
             </button>
           </div>
+          @if (passwordCtrl.touched && passwordCtrl.hasError('required')) {
+            <p class="field-error"><i class="bi bi-x-circle"></i> Password is required</p>
+          } @else if (passwordCtrl.touched && passwordCtrl.hasError('minlength')) {
+            <p class="field-error"><i class="bi bi-x-circle"></i> Password must be at least 6 characters</p>
+          }
         </div>
 
         <button type="submit" class="auth-submit-btn" [disabled]="loading()">

@@ -26,6 +26,21 @@ export class UsersComponent implements OnInit {
   editMode = signal(false);
   selectedUser = signal<UserResponse | null>(null);
 
+  // ── Custom confirm dialog ──
+  confirmVisible = signal(false);
+  confirmMessage = signal('');
+  confirmTitle   = signal('');
+  private pendingAction: (() => void) | null = null;
+
+  showConfirm(title: string, message: string, action: () => void) {
+    this.confirmTitle.set(title);
+    this.confirmMessage.set(message);
+    this.pendingAction = action;
+    this.confirmVisible.set(true);
+  }
+  confirmYes() { this.confirmVisible.set(false); this.pendingAction?.(); this.pendingAction = null; }
+  confirmNo()  { this.confirmVisible.set(false); this.pendingAction = null; }
+
   form = { name: '', email: '', phoneNumber: '', password: '', role: 'CUSTOMER' as any };
 
   ngOnInit() { this.load(); }
@@ -81,11 +96,16 @@ export class UsersComponent implements OnInit {
   }
 
   delete(u: UserResponse) {
-    if (!confirm(`Delete user "${u.name}"?`)) return;
-    this.svc.delete(u.id).subscribe({
-      next: () => { this.success.set('User deleted.'); this.load(); },
-      error: err => this.error.set(err.error || 'Delete failed.')
-    });
+    this.showConfirm(
+      'Delete User',
+      `Are you sure you want to delete "${u.name}" (${u.email})? This action cannot be undone.`,
+      () => {
+        this.svc.delete(u.id).subscribe({
+          next: () => { this.success.set('User deleted.'); this.load(); },
+          error: err => this.error.set(err.error || 'Delete failed.')
+        });
+      }
+    );
   }
 
   roleBadge(role: string) {

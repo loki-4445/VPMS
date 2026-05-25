@@ -21,13 +21,23 @@
     "bootstrap-icons": "^1.13.1",
     "jwt-decode": "^4.0.0",
     "rxjs": "~7.8.0",
-    "tslib": "^2.3.0"
+    "tslib": "^2.3.0",
+    "zone.js": "^0.16.2"
   },
   "devDependencies": {
+    "@angular-devkit/build-angular": "^21.2.12",
     "@angular/build": "^21.2.10",
     "@angular/cli": "^21.2.10",
     "@angular/compiler-cli": "^21.2.0",
+    "@angular/platform-browser-dynamic": "^21.2.14",
+    "@types/jasmine": "^6.0.0",
     "autoprefixer": "^10.5.0",
+    "jasmine-core": "^6.2.0",
+    "karma": "^6.4.4",
+    "karma-chrome-launcher": "^3.2.0",
+    "karma-coverage": "^2.2.1",
+    "karma-jasmine": "^5.1.0",
+    "karma-jasmine-html-reporter": "^2.2.0",
     "postcss": "^8.5.14",
     "prettier": "^3.8.1",
     "typescript": "~5.9.2"

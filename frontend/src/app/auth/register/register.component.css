@@ -1,6 +1,17 @@
 :host { display: block; }
 
-/* ── Page ────────────────────────────────────────────────────────── */
+/* Hide the browser's built-in password reveal eye (Edge / Chrome) — we have our own */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+input::-webkit-contacts-auto-fill-button,
+input::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* ── Page  */
 .auth-page {
   min-height: 100vh;
   background: linear-gradient(to bottom right, #312e81, #581c87, #3730a3);
@@ -10,7 +21,7 @@
   padding: 1rem;
 }
 
-/* ── Card ────────────────────────────────────────────────────────── */
+/* ── Card  */
 .auth-card {
   width: 100%;
   max-width: 56rem;
@@ -21,7 +32,7 @@
   display: flex;
 }
 
-/* ── Brand panel ─────────────────────────────────────────────────── */
+/* ── Brand panel  */
 .auth-brand {
   display: none;
   width: 41.666667%;
@@ -79,7 +90,7 @@
 
 .feature-check { color: #4ade80; flex-shrink: 0; }
 
-/* ── Form panel ──────────────────────────────────────────────────── */
+/* ── Form panel  */
 .auth-form-panel {
   flex: 1;
   display: flex;
@@ -89,7 +100,7 @@
   overflow-y: auto;
 }
 
-/* ── Mobile logo ─────────────────────────────────────────────────── */
+/* ── Mobile logo  */
 .auth-mobile-logo {
   display: flex;
   align-items: center;
@@ -99,7 +110,7 @@
 .auth-mobile-icon  { font-size: 1.5rem; color: #4f46e5; }
 .auth-mobile-brand { font-weight: 700; font-size: 1.125rem; color: #4f46e5; }
 
-/* ── Form title ─────────────────────────────────────────────────── */
+/* ── Form title  */
 .auth-form-title {
   font-size: 1.5rem;
   font-weight: 700;
@@ -112,14 +123,14 @@
   margin-bottom: 1.25rem;
 }
 
-/* ── Form ────────────────────────────────────────────────────────── */
+/* ── Form  */
 .auth-form {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
-/* ── Input group ─────────────────────────────────────────────────── */
+/* ── Input group  */
 .auth-input-group {
   display: flex;
   border-radius: 0.5rem;
@@ -180,7 +191,7 @@
   &:hover { color: #475569; }
 }
 
-/* ── Submit button ──────────────────────────────────────────────── */
+/* ── Submit button  */
 .auth-submit-btn {
   width: 100%;
   padding: 0.75rem;
@@ -202,12 +213,12 @@
   &:disabled { opacity: 0.6; cursor: not-allowed; }
 }
 
-/* ── Spinner ─────────────────────────────────────────────────────── */
+/* ── Spinner  */
 .btn-spinner   { width: 1rem; height: 1rem; }
 .spinner-track { opacity: 0.25; }
 .spinner-fill  { opacity: 0.75; }
 
-/* ── Footer ─────────────────────────────────────────────────────── */
+/* ── Footer  */
 .auth-footer-text {
   margin-top: 1.25rem;
   text-align: center;
@@ -222,6 +233,53 @@
   transition: color 0.15s;
   &:hover { color: #3730a3; }
 }
+
+/* ── Form label  */
+.form-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 0.375rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Field wrapper  */
+.field-group { display: flex; flex-direction: column; }
+
+/* ── Inline error / ok messages  */
+.field-error {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.3rem;
+  font-size: 0.75rem;
+  color: #dc2626;
+  font-weight: 500;
+}
+
+.field-ok {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.3rem;
+  font-size: 0.75rem;
+  color: #16a34a;
+  font-weight: 500;
+}
+
+/* ── Alert  */
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  margin-bottom: 0.875rem;
+}
+.alert-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 
 /* ── Responsive ─────────────────────────────────────────────────── */
 @media (min-width: 768px) {

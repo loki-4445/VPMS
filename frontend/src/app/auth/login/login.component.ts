@@ -1,27 +1,43 @@
-﻿import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-  private auth = inject(AuthService);
+  private auth   = inject(AuthService);
   private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private route  = inject(ActivatedRoute);
+  private fb     = inject(FormBuilder);
 
-  email = '';
-  password = '';
-  loading = signal(false);
-  error = signal('');
+  // ── Signals (unchanged) 
+  loading      = signal(false);
+  error        = signal('');
   showPassword = signal(false);
-  registered = signal(false);
+  registered   = signal(false);
+
+  // ── Reactive form 
+  form: FormGroup = this.fb.group({
+    email: ['', [
+      Validators.required,
+      Validators.pattern(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/)  
+    ]],
+    password: ['', [
+      Validators.required,
+      Validators.minLength(6)
+    ]]
+  });
+
+  // ── Shortcut getters 
+  get emailCtrl()    { return this.form.get('email')!; }
+  get passwordCtrl() { return this.form.get('password')!; }
 
   ngOnInit() {
     this.route.queryParams.subscribe(p => {
@@ -37,15 +53,18 @@ export class LoginComponent implements OnInit {
     return fallback;
   }
 
+  // ── Login (backend call unchanged) 
   login() {
-    if (!this.email || !this.password) {
-      this.error.set('Please enter email and password.');
-      return;
-    }
+    this.form.markAllAsTouched();
+    if (this.form.invalid) return;
+
     this.loading.set(true);
     this.error.set('');
 
-    this.auth.login({ email: this.email, password: this.password }).subscribe({
+    this.auth.login({
+      email:    this.emailCtrl.value.trim(),
+      password: this.passwordCtrl.value
+    }).subscribe({
       next: () => {
         this.loading.set(false);
         this.router.navigate(['/dashboard']);

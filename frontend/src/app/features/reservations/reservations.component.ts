@@ -27,6 +27,7 @@ export class ReservationsComponent implements OnInit {
   saving = signal(false);
   error = signal('');
   success = signal('');
+  startTimeError = signal('');
 
   filterStatus = '';
   searchVehicle = '';
@@ -35,10 +36,24 @@ export class ReservationsComponent implements OnInit {
   editMode = signal(false);
   selectedRes = signal<ReservationResponse | null>(null);
 
+  // ── Custom confirm dialog ──
+  confirmVisible  = signal(false);
+  confirmMessage  = signal('');
+  confirmTitle    = signal('');
+  private pendingAction: (() => void) | null = null;
+
+  showConfirm(title: string, message: string, action: () => void) {
+    this.confirmTitle.set(title);
+    this.confirmMessage.set(message);
+    this.pendingAction = action;
+    this.confirmVisible.set(true);
+  }
+  confirmYes() { this.confirmVisible.set(false); this.pendingAction?.(); this.pendingAction = null; }
+  confirmNo()  { this.confirmVisible.set(false); this.pendingAction = null; }
+
   form = {
     vehicleNumber: '',
     startTime: '',
-    endTime: '',
     slotId: 0,
     slotType: '2W' as '2W' | '4W'
   };
@@ -84,10 +99,10 @@ export class ReservationsComponent implements OnInit {
   openAdd() {
     this.editMode.set(false);
     this.selectedRes.set(null);
-    this.form = { vehicleNumber: '', startTime: '', endTime: '', slotId: 0, slotType: '2W' };
+    this.form = { vehicleNumber: '', startTime: '', slotId: 0, slotType: '2W' };
     this.loadAvailableSlots('2W');
     this.showModal.set(true);
-    this.error.set(''); this.success.set('');
+    this.error.set(''); this.success.set(''); this.startTimeError.set('');
   }
 
   openEdit(r: ReservationResponse) {
@@ -96,13 +111,12 @@ export class ReservationsComponent implements OnInit {
     this.form = {
       vehicleNumber: r.vehicleNumber,
       startTime: r.startTime ? r.startTime.substring(0, 16) : '',
-      endTime: r.endTime ? r.endTime.substring(0, 16) : '',
       slotId: r.slotId,
       slotType: (r.slotType === '2W' || r.slotType === '4W') ? r.slotType : '2W'
     };
     this.loadAvailableSlots(this.form.slotType);
     this.showModal.set(true);
-    this.error.set(''); this.success.set('');
+    this.error.set(''); this.success.set(''); this.startTimeError.set('');
   }
 
   loadAvailableSlots(type: string) {
@@ -114,16 +128,27 @@ export class ReservationsComponent implements OnInit {
 
   onTypeChange() { this.loadAvailableSlots(this.form.slotType); this.form.slotId = 0; }
 
+  /** Called every time the start-time input changes — blocks past selections immediately */
+  validateStartTime() {
+    if (this.form.startTime && this.form.startTime < this.minDateTime) {
+      this.startTimeError.set('Start time cannot be in the past.');
+    } else {
+      this.startTimeError.set('');
+    }
+  }
+
   save() {
     if (!this.form.vehicleNumber || !this.form.startTime || !this.form.slotId) {
       this.error.set('Please fill all required fields.'); return;
+    }
+    if (this.form.startTime < this.minDateTime) {
+      this.startTimeError.set('Start time cannot be in the past.'); return;
     }
     this.saving.set(true); this.error.set('');
 
     const payload = {
       vehicleNumber: this.form.vehicleNumber,
-      startTime: this.form.startTime,
-      endTime: this.form.endTime || undefined
+      startTime: this.form.startTime
     };
 
     if (this.editMode() && this.selectedRes()) {
@@ -142,11 +167,24 @@ export class ReservationsComponent implements OnInit {
   }
 
   cancel(r: ReservationResponse) {
-    if (!confirm(`Cancel reservation #${r.id}?`)) return;
-    this.svc.cancel(r.id).subscribe({
-      next: () => { this.success.set('Reservation cancelled.'); this.load(); },
-      error: err => this.error.set(err.error?.message || 'Cancel failed.')
-    });
+    this.showConfirm(
+      'Cancel Reservation',
+      `Are you sure you want to cancel reservation #${r.id} for vehicle ${r.vehicleNumber}?`,
+      () => {
+        this.svc.cancel(r.id).subscribe({
+          next: () => { this.success.set('Reservation cancelled.'); this.load(); },
+          error: err => this.error.set(err.error?.message || 'Cancel failed.')
+        });
+      }
+    );
+  }
+
+  /** Returns current local datetime in YYYY-MM-DDTHH:mm — used as [min] on datetime-local inputs */
+  get minDateTime(): string {
+    const now = new Date();
+    // toISOString() gives UTC; we need local time so the browser min check matches what the user sees
+    const offset = now.getTimezoneOffset() * 60000;
+    return new Date(now.getTime() - offset).toISOString().substring(0, 16);
   }
 
   statusBadge(s: string) {

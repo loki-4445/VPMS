@@ -161,3 +161,25 @@
     </div>
   </div>
 }
+
+<!-- ── Custom Confirm Dialog ── -->
+@if (confirmVisible()) {
+  <div class="modal-overlay" (click)="confirmNo()"></div>
+  <div class="modal-wrapper">
+    <div class="confirm-dialog animate-scale-in">
+      <div class="confirm-icon confirm-icon--danger">
+        <i class="bi bi-person-x-fill"></i>
+      </div>
+      <h3 class="confirm-title">{{ confirmTitle() }}</h3>
+      <p class="confirm-message">{{ confirmMessage() }}</p>
+      <div class="confirm-actions">
+        <button class="btn-secondary-tw" (click)="confirmNo()">
+          <i class="bi bi-x-lg"></i> No, Keep it
+        </button>
+        <button class="confirm-btn-danger" (click)="confirmYes()">
+          <i class="bi bi-trash3"></i> Yes, Delete
+        </button>
+      </div>
+    </div>
+  </div>
+}

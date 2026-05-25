@@ -43,10 +43,7 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.removeItem(this.TOKEN_KEY);
-    localStorage.removeItem(this.ROLE_KEY);
-    localStorage.removeItem(this.EMAIL_KEY);
-    localStorage.removeItem(this.USER_ID_KEY);
+    this.clearStorage();
     this.isLoggedIn.set(false);
     this.currentRole.set(null);
     this.router.navigate(['/login']);
@@ -95,9 +92,23 @@ export class AuthService {
     if (!token) return false;
     try {
       const decoded = jwtDecode<JwtPayload>(token);
-      return decoded.exp * 1000 > Date.now();
+      if (decoded.exp * 1000 > Date.now()) {
+        return true;
+      }
+      // Token exists but is expired — wipe it so the interceptor
+      // never sends a stale token to the login endpoint
+      this.clearStorage();
+      return false;
     } catch {
+      this.clearStorage();
       return false;
     }
+  }
+
+  private clearStorage() {
+    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.ROLE_KEY);
+    localStorage.removeItem(this.EMAIL_KEY);
+    localStorage.removeItem(this.USER_ID_KEY);
   }
 }

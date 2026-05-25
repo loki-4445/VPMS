@@ -28,6 +28,21 @@ export class SlotsComponent implements OnInit {
   selectedSlot = signal<SlotResponse | null>(null);
   form = { type: '2W' as '2W' | '4W', location: 'A' as any };
 
+  // ── Custom confirm dialog ──
+  confirmVisible = signal(false);
+  confirmMessage = signal('');
+  confirmTitle   = signal('');
+  private pendingAction: (() => void) | null = null;
+
+  showConfirm(title: string, message: string, action: () => void) {
+    this.confirmTitle.set(title);
+    this.confirmMessage.set(message);
+    this.pendingAction = action;
+    this.confirmVisible.set(true);
+  }
+  confirmYes() { this.confirmVisible.set(false); this.pendingAction?.(); this.pendingAction = null; }
+  confirmNo()  { this.confirmVisible.set(false); this.pendingAction = null; }
+
   ngOnInit() { this.load(); }
 
   load() {
@@ -82,11 +97,16 @@ export class SlotsComponent implements OnInit {
   }
 
   delete(s: SlotResponse) {
-    if (!confirm(`Delete slot #${s.id}?`)) return;
-    this.svc.delete(s.id).subscribe({
-      next: () => { this.success.set('Slot deleted.'); this.load(); },
-      error: err => this.error.set(err.error?.message || 'Delete failed.')
-    });
+    this.showConfirm(
+      'Delete Slot',
+      `Are you sure you want to delete slot #${s.id} (${s.location} · ${s.type})?`,
+      () => {
+        this.svc.delete(s.id).subscribe({
+          next: () => { this.success.set('Slot deleted.'); this.load(); },
+          error: err => this.error.set(err.error?.message || 'Delete failed.')
+        });
+      }
+    );
   }
 
   statusLabel(s: number) { return s === -1 ? 'Available' : s === 0 ? 'Reserved' : 'Occupied'; }
