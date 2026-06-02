@@ -54,5 +54,5 @@ export const routes: Routes = [
       },
     ]
   },
-  { path: '**', redirectTo: '' }
+  { path: '**', component:FallbackComponent }
 ];
