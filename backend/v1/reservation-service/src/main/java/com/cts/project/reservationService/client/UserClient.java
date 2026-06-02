@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "USER-SERVICE", fallback = UserClientFallback.class)
 public interface UserClient {
 
-    @GetMapping("/users/internal/{id}")  // ✅ correct path
+    @GetMapping("/users/internal/{id}")
     UserResponse getUserById(@PathVariable long id);
 }

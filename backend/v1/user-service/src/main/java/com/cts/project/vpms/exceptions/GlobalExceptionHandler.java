@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 
 @RestControllerAdvice
@@ -17,6 +18,15 @@ public class GlobalExceptionHandler {
             UserNotFoundException ex, HttpServletRequest req) {
         log.warn("User not found | path={}", req.getRequestURI());
         return build(HttpStatus.NOT_FOUND, "Not Found", ex.getMessage(), req.getRequestURI());
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ErrorResponse> handleResponseStatus(
+            ResponseStatusException ex, HttpServletRequest req) {
+        HttpStatus status = HttpStatus.resolve(ex.getStatusCode().value());
+        if (status == null) status = HttpStatus.INTERNAL_SERVER_ERROR;
+        log.warn("ResponseStatusException | path={} | status={} | msg={}", req.getRequestURI(), status, ex.getReason());
+        return build(status, status.getReasonPhrase(), ex.getReason(), req.getRequestURI());
     }
 
     @ExceptionHandler(Exception.class)

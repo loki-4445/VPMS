@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:9090'
+  apiUrl: ''   // Empty = relative URL → Angular proxy forwards to localhost:9090 silently
 };

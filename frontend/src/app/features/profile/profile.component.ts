@@ -74,7 +74,6 @@ export class ProfileComponent implements OnInit {
       this.profile.set({ ...p, name: this.form.name, phoneNumber: this.form.phoneNumber });
     },
     error: err => {
-      console.error('Update error:', err); // â† add this to see the real error
       this.error.set(err.error?.message || err.message || 'Update failed.');
       this.saving.set(false);
     }
@@ -88,3 +87,4 @@ export class ProfileComponent implements OnInit {
     this.error.set('');
   }
 }
+

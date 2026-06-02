@@ -64,11 +64,6 @@ public class ReservationServiceImpl implements ReservationService {
         boolean alreadyBooked = reservationRepository.existsOverlappingReservation(
                 slotId, reservation.getStartTime(), effectiveEndTime);
         if (alreadyBooked) {
-            // Before rejecting, verify the slot's actual physical status.
-            // If the slot is physically AVAILABLE (-1), the CONFIRMED reservation(s)
-            // are stale — the vehicle already left but the reservation was never
-            // marked COMPLETED (e.g. the service was down during vehicle exit).
-            // Auto-complete those stale reservations and allow the new booking.
             boolean slotPhysicallyFree = false;
             try {
                 ParkingResponse currentSlot = parkingClient.getSlotById(slotId);
@@ -170,8 +165,6 @@ public class ReservationServiceImpl implements ReservationService {
         if (updatedData.getEndTime() != null) {
             existing.setEndTime(updatedData.getEndTime());
             existing.setStatus(STATUS_COMPLETED);
-            // Wrap slot-free in try-catch: vehicle-logging-service may have already freed it.
-            // A circuit-breaker CallNotPermittedException must NOT roll back the @Transactional.
             try {
                 parkingClient.updateSlotStatus(existing.getSlotId(), -1);
             } catch (Exception e) {

@@ -90,6 +90,31 @@ input::-webkit-credentials-auto-fill-button {
 
 .feature-check { color: #4ade80; flex-shrink: 0; }
 
+/* ── Back to home button ─────────────────────────────────────────── */
+.back-home-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4f46e5;
+  text-decoration: none;
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1.5px solid #e0e7ff;
+  background: #f5f3ff;
+  margin-bottom: 1.25rem;
+  align-self: flex-start;
+  transition: background 0.18s, border-color 0.18s, transform 0.15s;
+}
+.back-home-btn:hover {
+  background: #ede9fe;
+  border-color: #a5b4fc;
+  transform: translateX(-2px);
+  text-decoration: none;
+  color: #3730a3;
+}
+
 /* ── Form panel  */
 .auth-form-panel {
   flex: 1;

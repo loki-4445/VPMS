@@ -6,9 +6,11 @@ import com.cts.project.vpms.entity.User;
 import com.cts.project.vpms.repository.UserRepository;
 import com.cts.project.vpms.security.JwtUtil;
 import com.cts.project.vpms.service.LoginService;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class LoginServiceImpl implements LoginService {
@@ -29,11 +31,11 @@ public class LoginServiceImpl implements LoginService {
         System.out.println("LOGIN EMAIL = [" + loginRequest.getEmail() + "]");
 
         User user = userRepo.findByEmail(loginRequest.getEmail()).orElseThrow(
-                () -> new RuntimeException("User does not exist")
+                () -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password.")
         );
 
         if(!(passwordEncoder.matches(loginRequest.getPassword(), user.getPassword_hash()))) {
-            throw new RuntimeException("Credentials doesn't match");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password.");
         }
 
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());

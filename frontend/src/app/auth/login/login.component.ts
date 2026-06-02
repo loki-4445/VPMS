@@ -46,7 +46,8 @@ export class LoginComponent implements OnInit {
   }
 
   private parseError(err: any, fallback: string): string {
-    if (err.status === 0) return 'Cannot connect to server. Please make sure the backend is running.';
+    if (err.status === 0)   return 'Cannot connect to server. Please make sure the backend is running.';
+    if (err.status === 401) return 'Invalid email or password. Please try again.';
     if (typeof err.error === 'string') return err.error;
     if (err.error?.message) return err.error.message;
     if (err.message) return err.message;
